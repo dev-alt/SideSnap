@@ -16,7 +16,7 @@ public class CustomIconConverter : IMultiValueConverter
     public object? Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
         if (_iconService == null)
-            return Binding.DoNothing;
+            return System.Windows.Data.Binding.DoNothing;
 
         // values[0] = CustomIconPath or IconPath
         // values[1] = Path (for shortcuts) or null (for commands)
@@ -33,7 +33,7 @@ public class CustomIconConverter : IMultiValueConverter
             return _iconService.GetIcon(fallbackPath);
         }
 
-        return Binding.DoNothing;
+        return System.Windows.Data.Binding.DoNothing;
     }
 
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
