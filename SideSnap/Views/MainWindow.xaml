@@ -98,26 +98,26 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button d:DataContext="{d:DesignInstance Type=models:FolderShortcut, IsDesignTimeCreatable=True}"
-                                        Command="{Binding DataContext.OpenShortcutCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Command="{Binding DataContext.OpenShortcutCommand, Source={x:Reference RootWindow}}"
                                        CommandParameter="{Binding}"
                                        Margin="5,3"
                                        HorizontalAlignment="Stretch"
                                        Style="{StaticResource SidebarButton}">
                                     <Button.ContextMenu>
-                                        <ContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}">
+                                        <ContextMenu>
                                             <MenuItem Header="Edit"
-                                                     Command="{Binding EditShortcutCommand}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                     Command="{Binding DataContext.EditShortcutCommand, Source={x:Reference RootWindow}}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
                                             <MenuItem Header="Move Up"
-                                                     Command="{Binding MoveShortcutUpCommand}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                     Command="{Binding DataContext.MoveShortcutUpCommand, Source={x:Reference RootWindow}}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
                                             <MenuItem Header="Move Down"
-                                                     Command="{Binding MoveShortcutDownCommand}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                     Command="{Binding DataContext.MoveShortcutDownCommand, Source={x:Reference RootWindow}}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
                                             <Separator/>
                                             <MenuItem Header="Delete"
-                                                     Command="{Binding RemoveShortcutCommand}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                     Command="{Binding DataContext.RemoveShortcutCommand, Source={x:Reference RootWindow}}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
@@ -153,26 +153,26 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button d:DataContext="{d:DesignInstance Type=models:PowerShellCommand, IsDesignTimeCreatable=True}"
-                                        Command="{Binding DataContext.ExecuteCommandCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Command="{Binding DataContext.ExecuteCommandCommand, Source={x:Reference RootWindow}}"
                                        CommandParameter="{Binding}"
                                        Margin="5,3"
                                        HorizontalAlignment="Stretch"
                                        Style="{StaticResource SidebarButton}">
                                     <Button.ContextMenu>
-                                        <ContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}">
+                                        <ContextMenu>
                                             <MenuItem Header="Edit"
-                                                     Command="{Binding EditCommandCommand}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                     Command="{Binding DataContext.EditCommandCommand, Source={x:Reference RootWindow}}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
                                             <MenuItem Header="Move Up"
-                                                     Command="{Binding MoveCommandUpCommand}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                     Command="{Binding DataContext.MoveCommandUpCommand, Source={x:Reference RootWindow}}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
                                             <MenuItem Header="Move Down"
-                                                     Command="{Binding MoveCommandDownCommand}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                     Command="{Binding DataContext.MoveCommandDownCommand, Source={x:Reference RootWindow}}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
                                             <Separator/>
                                             <MenuItem Header="Delete"
-                                                     Command="{Binding RemoveCommandCommand}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                     Command="{Binding DataContext.RemoveCommandCommand, Source={x:Reference RootWindow}}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
