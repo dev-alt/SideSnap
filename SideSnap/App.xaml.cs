@@ -64,16 +64,20 @@ public partial class App
         services.AddSingleton<IShortcutService, ShortcutService>();
         services.AddSingleton<ITrayService, TrayService>();
         services.AddSingleton<IIconService, IconService>();
+        services.AddSingleton<ITodoService, TodoService>();
 
         // ViewModels
         services.AddSingleton<MainViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddTransient<TodoViewModel>();
 
         // Views
         services.AddSingleton<MainWindow>();
         services.AddTransient<SettingsWindow>();
         services.AddTransient<AddShortcutDialog>();
         services.AddTransient<AddCommandDialog>();
+        services.AddTransient<TodoWindow>();
+        services.AddTransient<AddTodoDialog>();
     }
 
     private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
