@@ -10,6 +10,7 @@ using SideSnap.Models;
 using SideSnap.Services;
 using SideSnap.Utils;
 using SideSnap.Views;
+using MessageBox = System.Windows.MessageBox;
 
 namespace SideSnap.ViewModels;
 
