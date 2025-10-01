@@ -62,7 +62,7 @@ public partial class MainWindow
         // Setup auto-hide timer
         _hideTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(500)
+            Interval = TimeSpan.FromMilliseconds(1500)
         };
         _hideTimer.Tick += HideTimer_Tick;
 

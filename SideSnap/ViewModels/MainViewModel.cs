@@ -466,15 +466,55 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void AddProject()
     {
-        // TODO: Create AddProjectDialog
-        var project = new Project
+        var dialog = _serviceProvider.GetRequiredService<AddProjectDialog>();
+        dialog.Title = "Add Project";
+        if (dialog.ShowDialog() == true)
         {
-            Name = "New Project",
-            Order = Projects.Count
-        };
-        Projects.Add(project);
-        SaveProjects();
-        _logger.LogInformation("Added project: {Name}", project.Name);
+            var project = new Project
+            {
+                Name = dialog.ProjectName,
+                IconPath = dialog.CustomIconPath,
+                Order = Projects.Count
+            };
+
+            foreach (var item in dialog.Items)
+            {
+                project.Items.Add(item);
+            }
+
+            Projects.Add(project);
+            SaveProjects();
+            _logger.LogInformation("Added project: {Name} with {Count} items", project.Name, project.Items.Count);
+        }
+    }
+
+    [RelayCommand]
+    private void EditProject(Project? project)
+    {
+        if (project == null) return;
+
+        var dialog = _serviceProvider.GetRequiredService<AddProjectDialog>();
+        dialog.Title = "Edit Project";
+        dialog.SetProject(project);
+
+        if (dialog.ShowDialog() == true)
+        {
+            project.Name = dialog.ProjectName;
+            project.IconPath = dialog.CustomIconPath;
+            project.Items.Clear();
+
+            foreach (var item in dialog.Items)
+            {
+                project.Items.Add(item);
+            }
+
+            SaveProjects();
+            // Force UI refresh
+            var index = Projects.IndexOf(project);
+            Projects.RemoveAt(index);
+            Projects.Insert(index, project);
+            _logger.LogInformation("Edited project: {Name} with {Count} items", project.Name, project.Items.Count);
+        }
     }
 
     [RelayCommand]

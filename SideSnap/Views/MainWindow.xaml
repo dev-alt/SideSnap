@@ -177,6 +177,10 @@
                                            MouseLeave="ProjectButton_MouseLeave">
                                         <Button.ContextMenu>
                                             <ContextMenu>
+                                                <MenuItem Header="Edit"
+                                                         Command="{Binding DataContext.EditProjectCommand, Source={x:Reference RootWindow}}"
+                                                         CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                <Separator/>
                                                 <MenuItem Header="Delete"
                                                          Command="{Binding DataContext.RemoveProjectCommand, Source={x:Reference RootWindow}}"
                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
@@ -209,28 +213,66 @@
                                            Placement="Right"
                                            IsOpen="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
                                            StaysOpen="False"
-                                           AllowsTransparency="True">
-                                        <Border Background="White"
-                                               BorderBrush="#CCCCCC"
-                                               BorderThickness="1"
+                                           AllowsTransparency="True"
+                                           HorizontalOffset="5">
+                                        <Border Background="#F0F0F0"
+                                               BorderBrush="#999999"
+                                               BorderThickness="2"
                                                CornerRadius="5"
-                                               Padding="5"
-                                               Margin="5,0,0,0">
+                                               Padding="10"
+                                               MinWidth="200"
+                                               MinHeight="50">
                                             <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="2" BlurRadius="10" Opacity="0.3"/>
+                                                <DropShadowEffect ShadowDepth="3" BlurRadius="15" Opacity="0.5"/>
                                             </Border.Effect>
-                                            <StackPanel MinWidth="150">
+                                            <StackPanel>
                                                 <ItemsControl ItemsSource="{Binding Items}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
                                                             <Button Command="{Binding DataContext.ExecuteProjectItemCommand, Source={x:Reference RootWindow}}"
                                                                    CommandParameter="{Binding}"
-                                                                   Style="{StaticResource SidebarButton}"
                                                                    Margin="2"
-                                                                   HorizontalAlignment="Stretch">
+                                                                   Padding="8"
+                                                                   HorizontalAlignment="Stretch"
+                                                                   Background="White"
+                                                                   BorderBrush="#CCCCCC"
+                                                                   BorderThickness="1"
+                                                                   Cursor="Hand">
+                                                                <Button.Style>
+                                                                    <Style TargetType="Button">
+                                                                        <Setter Property="Background" Value="White"/>
+                                                                        <Setter Property="Template">
+                                                                            <Setter.Value>
+                                                                                <ControlTemplate TargetType="Button">
+                                                                                    <Border Background="{TemplateBinding Background}"
+                                                                                           BorderBrush="{TemplateBinding BorderBrush}"
+                                                                                           BorderThickness="{TemplateBinding BorderThickness}"
+                                                                                           CornerRadius="3"
+                                                                                           Padding="{TemplateBinding Padding}">
+                                                                                        <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                                                                    </Border>
+                                                                                </ControlTemplate>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                        <Style.Triggers>
+                                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                                <Setter Property="Background" Value="#E8F4FF"/>
+                                                                            </Trigger>
+                                                                            <Trigger Property="IsPressed" Value="True">
+                                                                                <Setter Property="Background" Value="#C8E4FF"/>
+                                                                            </Trigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Button.Style>
                                                                 <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock Text="{Binding Type}"
+                                                                              FontWeight="Bold"
+                                                                              Foreground="#3498DB"
+                                                                              Width="60"
+                                                                              Margin="0,0,8,0"
+                                                                              VerticalAlignment="Center"/>
                                                                     <TextBlock Text="{Binding Name}"
-                                                                              FontSize="11"
+                                                                              FontSize="12"
                                                                               VerticalAlignment="Center"/>
                                                                 </StackPanel>
                                                             </Button>

@@ -82,6 +82,7 @@ public partial class App
         services.AddTransient<AddCommandDialog>();
         services.AddTransient<TodoWindow>();
         services.AddTransient<AddTodoDialog>();
+        services.AddTransient<AddProjectDialog>();
     }
 
     private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
