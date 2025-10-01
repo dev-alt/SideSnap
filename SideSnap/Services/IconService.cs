@@ -15,13 +15,13 @@ public class IconService : IIconService
 
     // Win32 API
     [DllImport("shell32.dll", CharSet = CharSet.Auto)]
-    private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbFileInfo, uint uFlags);
+    private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref ShFileInfo psfi, uint cbFileInfo, uint uFlags);
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool DestroyIcon(IntPtr hIcon);
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    private struct SHFILEINFO
+    private struct ShFileInfo
     {
         public IntPtr hIcon;
         public int iIcon;
@@ -32,19 +32,18 @@ public class IconService : IIconService
         public string szTypeName;
     }
 
-    private const uint SHGFI_ICON = 0x000000100;
-    private const uint SHGFI_SMALLICON = 0x000000001;
-    private const uint SHGFI_LARGEICON = 0x000000000;
-    private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
-    private const uint FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
-    private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080;
+    private const uint ShgfiIcon = 0x000000100;
+    private const uint ShgfiSmallIcon = 0x000000001;
+    private const uint ShgfiUseFileAttributes = 0x000000010;
+    private const uint FileAttributeDirectory = 0x00000010;
+    private const uint FileAttributeNormal = 0x00000080;
 
     public IconService(ILogger<IconService> logger)
     {
         _logger = logger;
     }
 
-    public ImageSource? GetIcon(string path)
+    public ImageSource GetIcon(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             return GetFileIcon();
@@ -102,7 +101,7 @@ public class IconService : IIconService
         if (_iconCache.TryGetValue(folderKey, out var icon))
             return icon;
 
-        var folderIcon = ExtractGenericIcon(FILE_ATTRIBUTE_DIRECTORY);
+        var folderIcon = ExtractGenericIcon(FileAttributeDirectory);
         if (folderIcon != null)
         {
             folderIcon.Freeze();
@@ -119,7 +118,7 @@ public class IconService : IIconService
         if (_iconCache.TryGetValue(fileKey, out var icon))
             return icon;
 
-        var fileIcon = ExtractGenericIcon(FILE_ATTRIBUTE_NORMAL);
+        var fileIcon = ExtractGenericIcon(FileAttributeNormal);
         if (fileIcon != null)
         {
             fileIcon.Freeze();
@@ -132,17 +131,17 @@ public class IconService : IIconService
 
     private ImageSource? ExtractIcon(string path, bool isFolder)
     {
-        var shinfo = new SHFILEINFO();
-        uint flags = SHGFI_ICON | SHGFI_SMALLICON;
+        var shinfo = new ShFileInfo();
+        uint flags = ShgfiIcon | ShgfiSmallIcon;
 
         if (isFolder && !Directory.Exists(path))
         {
-            flags |= SHGFI_USEFILEATTRIBUTES;
+            flags |= ShgfiUseFileAttributes;
         }
 
         var result = SHGetFileInfo(
             path,
-            isFolder ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL,
+            isFolder ? FileAttributeDirectory : FileAttributeNormal,
             ref shinfo,
             (uint)Marshal.SizeOf(shinfo),
             flags);
@@ -173,13 +172,13 @@ public class IconService : IIconService
 
     private ImageSource? ExtractGenericIcon(uint fileAttributes)
     {
-        var shinfo = new SHFILEINFO();
+        var shinfo = new ShFileInfo();
         var result = SHGetFileInfo(
             "",
             fileAttributes,
             ref shinfo,
             (uint)Marshal.SizeOf(shinfo),
-            SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES);
+            ShgfiIcon | ShgfiSmallIcon | ShgfiUseFileAttributes);
 
         if (result == IntPtr.Zero)
             return null;
@@ -214,8 +213,8 @@ public class IconService : IIconService
             Background = System.Windows.Media.Brushes.LightGray
         };
 
-        visual.Measure(new System.Windows.Size(16, 16));
-        visual.Arrange(new System.Windows.Rect(0, 0, 16, 16));
+        visual.Measure(new Size(16, 16));
+        visual.Arrange(new Rect(0, 0, 16, 16));
         bitmap.Render(visual);
         bitmap.Freeze();
 

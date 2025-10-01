@@ -6,7 +6,7 @@ using SideSnap.Models;
 
 namespace SideSnap.Services;
 
-public class WindowManagerService : IWindowManagerService
+public partial class WindowManagerService : IWindowManagerService
 {
     private readonly string _positionsPath;
 
