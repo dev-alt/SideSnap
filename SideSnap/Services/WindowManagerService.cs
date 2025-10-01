@@ -111,7 +111,7 @@ public partial class WindowManagerService : IWindowManagerService
         var hwnd = FindWindowByProcessName(processName);
         if (hwnd != IntPtr.Zero)
         {
-            SetWindowPos(hwnd, IntPtr.Zero, position.X, position.Y, position.Width, position.Height, SwpNoZOrder | SwpShowWindow);
+            _ = SetWindowPos(hwnd, IntPtr.Zero, position.X, position.Y, position.Width, position.Height, SwpNoZOrder | SwpShowWindow);
         }
     }
 
@@ -119,7 +119,7 @@ public partial class WindowManagerService : IWindowManagerService
     {
         IntPtr foundWindow = IntPtr.Zero;
 
-        EnumWindows((hWnd, _) =>
+        _ = EnumWindows((hWnd, _) =>
         {
             if (!IsWindowVisible(hWnd))
                 return true; // Continue enumeration
@@ -211,11 +211,11 @@ public partial class WindowManagerService : IWindowManagerService
 
         if (width.HasValue && height.HasValue)
         {
-            SetWindowPos(hwnd, IntPtr.Zero, x, y, width.Value, height.Value, SwpNoZOrder | SwpShowWindow);
+            _ = SetWindowPos(hwnd, IntPtr.Zero, x, y, width.Value, height.Value, SwpNoZOrder | SwpShowWindow);
         }
         else
         {
-            SetWindowPos(hwnd, IntPtr.Zero, x, y, 0, 0, SwpNoSize | SwpNoZOrder | SwpShowWindow);
+            _ = SetWindowPos(hwnd, IntPtr.Zero, x, y, 0, 0, SwpNoSize | SwpNoZOrder | SwpShowWindow);
         }
     }
 }
