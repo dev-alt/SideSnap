@@ -151,18 +151,32 @@ public partial class MainWindow
                     {
                         _logger.LogInformation("File/folder dropped: {Path}", file);
 
-                        // Check if it's a directory or executable
+                        // Check if it's a directory or file type
                         if (Directory.Exists(file))
                         {
                             viewModel.AddDroppedFolder(file);
                         }
-                        else if (File.Exists(file) && Path.GetExtension(file).ToLower() == ".exe")
+                        else if (File.Exists(file))
                         {
-                            viewModel.AddDroppedExecutable(file);
-                        }
-                        else if (File.Exists(file) && Path.GetExtension(file).ToLower() == ".lnk")
-                        {
-                            viewModel.AddDroppedShortcut(file);
+                            var extension = Path.GetExtension(file).ToLower();
+                            switch (extension)
+                            {
+                                case ".exe":
+                                    viewModel.AddDroppedExecutable(file);
+                                    break;
+                                case ".lnk":
+                                    viewModel.AddDroppedShortcut(file);
+                                    break;
+                                case ".sh":
+                                    viewModel.AddDroppedShellScript(file);
+                                    break;
+                                case ".ps1":
+                                    viewModel.AddDroppedPowerShellScript(file);
+                                    break;
+                                default:
+                                    _logger.LogWarning("Unsupported file type dropped: {Extension}", extension);
+                                    break;
+                            }
                         }
                     }
                 }

@@ -180,7 +180,8 @@ public partial class MainViewModel : ViewModelBase
                 RunHidden = dialog.RunHidden,
                 RequiresElevation = dialog.RequiresElevation,
                 IsFavorite = dialog.IsFavorite,
-                ShowLabel = dialog.ShowLabel
+                ShowLabel = dialog.ShowLabel,
+                ScriptType = ScriptType.PowerShell
             };
 
             Commands.Add(command);
@@ -339,7 +340,8 @@ public partial class MainViewModel : ViewModelBase
         {
             Name = name,
             Command = $"Start-Process '{path}'",
-            RunHidden = false
+            RunHidden = false,
+            ScriptType = ScriptType.Executable
         };
 
         Commands.Add(command);
@@ -361,5 +363,57 @@ public partial class MainViewModel : ViewModelBase
         Shortcuts.Add(shortcut);
         SaveShortcuts();
         _logger.LogInformation("Added shortcut: {Name} -> {Path}", name, path);
+    }
+
+    public void AddDroppedShellScript(string path)
+    {
+        var name = Path.GetFileNameWithoutExtension(path);
+
+        // Convert Windows path to WSL path (e.g., C:\Users\... to /mnt/c/Users/...)
+        var wslPath = ConvertToWslPath(path);
+
+        var command = new PowerShellCommand
+        {
+            Name = name,
+            Command = $"wsl bash \"{wslPath}\"",
+            RunHidden = false,
+            ShowLabel = true,
+            ScriptType = ScriptType.Bash
+        };
+
+        Commands.Add(command);
+        _commandExecutor.SaveCommands(Commands);
+        _logger.LogInformation("Added shell script command: {Name} -> {Path}", name, path);
+    }
+
+    public void AddDroppedPowerShellScript(string path)
+    {
+        var name = Path.GetFileNameWithoutExtension(path);
+
+        var command = new PowerShellCommand
+        {
+            Name = name,
+            Command = $"& '{path}'",
+            RunHidden = false,
+            ShowLabel = true,
+            ScriptType = ScriptType.PowerShell
+        };
+
+        Commands.Add(command);
+        _commandExecutor.SaveCommands(Commands);
+        _logger.LogInformation("Added PowerShell script command: {Name} -> {Path}", name, path);
+    }
+
+    private static string ConvertToWslPath(string windowsPath)
+    {
+        // Convert Windows path to WSL path format
+        // C:\Users\... -> /mnt/c/Users/...
+        if (windowsPath.Length >= 2 && windowsPath[1] == ':')
+        {
+            var drive = char.ToLower(windowsPath[0]);
+            var pathPart = windowsPath.Substring(2).Replace('\\', '/');
+            return $"/mnt/{drive}{pathPart}";
+        }
+        return windowsPath.Replace('\\', '/');
     }
 }

@@ -8,4 +8,13 @@ public class PowerShellCommand
     public bool RequiresElevation { get; set; } = false;
     public bool IsFavorite { get; set; } = false;
     public bool ShowLabel { get; set; } = true;
+    public ScriptType ScriptType { get; set; } = ScriptType.PowerShell;
+}
+
+public enum ScriptType
+{
+    PowerShell,
+    Bash,
+    Executable,
+    Other
 }
