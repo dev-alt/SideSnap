@@ -14,13 +14,13 @@ public class IconService(ILogger<IconService> logger) : IIconService
 
     // Win32 API
     [DllImport("shell32.dll", CharSet = CharSet.Auto)]
-    private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref Shfileinfo psfi, uint cbFileInfo, uint uFlags);
+    private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbFileInfo, uint uFlags);
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool DestroyIcon(IntPtr hIcon);
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    private struct Shfileinfo
+    private struct SHFILEINFO
     {
         public IntPtr hIcon;
         public int iIcon;
@@ -31,12 +31,12 @@ public class IconService(ILogger<IconService> logger) : IIconService
         public string szTypeName;
     }
 
-    private const uint ShgfiIcon = 0x000000100;
+    private const uint SHGFI_ICON = 0x000000100;
     private const uint SHGFI_SMALLICON = 0x000000001;
-    private const uint ShgfiLargeicon = 0x000000000;
-    private const uint ShgfiUsefileattributes = 0x000000010;
-    private const uint FileAttributeDirectory = 0x00000010;
-    private const uint FileAttributeNormal = 0x00000080;
+    private const uint SHGFI_LARGEICON = 0x000000000;
+    private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
+    private const uint FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
+    private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080;
 
     public ImageSource GetIcon(string path)
     {
@@ -96,7 +96,7 @@ public class IconService(ILogger<IconService> logger) : IIconService
         if (_iconCache.TryGetValue(folderKey, out var icon))
             return icon;
 
-        var folderIcon = ExtractGenericIcon(FileAttributeDirectory);
+        var folderIcon = ExtractGenericIcon(FILE_ATTRIBUTE_DIRECTORY);
         if (folderIcon != null)
         {
             folderIcon.Freeze();
@@ -113,7 +113,7 @@ public class IconService(ILogger<IconService> logger) : IIconService
         if (_iconCache.TryGetValue(fileKey, out var icon))
             return icon;
 
-        var fileIcon = ExtractGenericIcon(FileAttributeNormal);
+        var fileIcon = ExtractGenericIcon(FILE_ATTRIBUTE_NORMAL);
         if (fileIcon != null)
         {
             fileIcon.Freeze();
@@ -126,17 +126,17 @@ public class IconService(ILogger<IconService> logger) : IIconService
 
     private ImageSource? ExtractIcon(string path, bool isFolder)
     {
-        var shinfo = new Shfileinfo();
-        uint flags = ShgfiIcon | SHGFI_SMALLICON;
+        var shinfo = new SHFILEINFO();
+        uint flags = SHGFI_ICON | SHGFI_SMALLICON;
 
         if (isFolder && !Directory.Exists(path))
         {
-            flags |= ShgfiUsefileattributes;
+            flags |= SHGFI_USEFILEATTRIBUTES;
         }
 
         var result = SHGetFileInfo(
             path,
-            isFolder ? FileAttributeDirectory : FileAttributeNormal,
+            isFolder ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL,
             ref shinfo,
             (uint)Marshal.SizeOf(shinfo),
             flags);
@@ -167,13 +167,13 @@ public class IconService(ILogger<IconService> logger) : IIconService
 
     private ImageSource? ExtractGenericIcon(uint fileAttributes)
     {
-        var shinfo = new Shfileinfo();
+        var shinfo = new SHFILEINFO();
         var result = SHGetFileInfo(
             "",
             fileAttributes,
             ref shinfo,
             (uint)Marshal.SizeOf(shinfo),
-            ShgfiIcon | SHGFI_SMALLICON | ShgfiUsefileattributes);
+            SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES);
 
         if (result == IntPtr.Zero)
             return null;

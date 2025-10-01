@@ -68,3 +68,4 @@ The application is organized into the following core modules:
 - Implement proper window message handling for auto-hide behavior
 - Support Windows 10/11 design guidelines for modern appearance
 - Register for startup with Windows via registry or startup folder
+- After pushing to github run ./sync.sh

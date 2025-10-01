@@ -65,7 +65,7 @@ public class ShortcutService : IShortcutService
         return
         [
             new()
-            {
+        {
                 Name = "Documents", Path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Order = 0
             },
             new()
