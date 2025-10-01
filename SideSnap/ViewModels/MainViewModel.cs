@@ -70,6 +70,9 @@ public partial class MainViewModel : ViewModelBase
     private void AddShortcut()
     {
         var dialog = _serviceProvider.GetRequiredService<AddShortcutDialog>();
+        dialog.Title = "Add Shortcut";
+        dialog.HeaderText = "Add New Shortcut";
+        dialog.PrimaryButtonText = "Add";
         if (dialog.ShowDialog() == true)
         {
             var shortcut = new FolderShortcut
@@ -99,8 +102,10 @@ public partial class MainViewModel : ViewModelBase
         if (shortcut == null) return;
 
         var dialog = _serviceProvider.GetRequiredService<AddShortcutDialog>();
-        // Pre-populate with existing values
+        // Pre-populate with existing values and adjust UI text
         dialog.Title = "Edit Shortcut";
+        dialog.HeaderText = "Edit Shortcut";
+        dialog.PrimaryButtonText = "Save";
         dialog.Loaded += (_, _) =>
         {
             var nameBox = dialog.FindName("NameTextBox") as System.Windows.Controls.TextBox;

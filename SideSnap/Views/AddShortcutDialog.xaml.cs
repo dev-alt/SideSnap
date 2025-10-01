@@ -8,9 +8,14 @@ public partial class AddShortcutDialog
     public string ShortcutName { get; private set; } = string.Empty;
     public string ShortcutPath { get; private set; } = string.Empty;
 
+    // New: texts to customize dialog header and primary button
+    public string HeaderText { get; set; } = "Add New Shortcut";
+    public string PrimaryButtonText { get; set; } = "Add";
+
     public AddShortcutDialog()
     {
         InitializeComponent();
+        DataContext = this; // allow simple bindings to dialog properties
     }
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)

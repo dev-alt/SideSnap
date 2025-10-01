@@ -25,10 +25,6 @@
         DragOver="Window_DragOver"
         x:Name="RootWindow">
 
-    <Window.Resources>
-        <d:DesignInstance x:Key="DesignMainViewModel" Type="viewModels:MainViewModel" IsDesignTimeCreatable="False" />
-    </Window.Resources>
-
     <Border Background="#F0F0F0"
             BorderBrush="#CCCCCC"
             BorderThickness="0,0,1,0"
@@ -98,30 +94,30 @@
                               Foreground="#7F8C8D"
                               Margin="5,5,5,5"/>
 
-                    <ItemsControl ItemsSource="{Binding Shortcuts}" d:ItemsSource="{d:DesignInstance Type=models:FolderShortcut, IsDesignTimeCreatable=True}" utils:DragDropReorderBehavior.IsEnabled="True">
+                    <ItemsControl ItemsSource="{Binding Shortcuts}" utils:DragDropReorderBehavior.IsEnabled="True">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button d:DataContext="{d:DesignInstance Type=models:FolderShortcut, IsDesignTimeCreatable=True}"
-                                        Command="{Binding DataContext.OpenShortcutCommand, RelativeSource={RelativeSource AncestorType=Window}, d:Source={StaticResource DesignMainViewModel}}"
+                                        Command="{Binding DataContext.OpenShortcutCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                        CommandParameter="{Binding}"
                                        Margin="5,3"
                                        HorizontalAlignment="Stretch"
                                        Style="{StaticResource SidebarButton}">
                                     <Button.ContextMenu>
-                                        <ContextMenu>
+                                        <ContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}">
                                             <MenuItem Header="Edit"
-                                                     Command="{Binding DataContext.EditShortcutCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     Command="{Binding EditShortcutCommand}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <MenuItem Header="Move Up"
-                                                     Command="{Binding DataContext.MoveShortcutUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     Command="{Binding MoveShortcutUpCommand}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <MenuItem Header="Move Down"
-                                                     Command="{Binding DataContext.MoveShortcutDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     Command="{Binding MoveShortcutDownCommand}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <Separator/>
                                             <MenuItem Header="Delete"
-                                                     Command="{Binding DataContext.RemoveShortcutCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     Command="{Binding RemoveShortcutCommand}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
@@ -153,30 +149,30 @@
                               Foreground="#7F8C8D"
                               Margin="5,10,5,5"/>
 
-                    <ItemsControl ItemsSource="{Binding Commands}" d:ItemsSource="{d:DesignInstance Type=models:PowerShellCommand, IsDesignTimeCreatable=True}" utils:DragDropReorderBehavior.IsEnabled="True">
+                    <ItemsControl ItemsSource="{Binding Commands}" utils:DragDropReorderBehavior.IsEnabled="True">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button d:DataContext="{d:DesignInstance Type=models:PowerShellCommand, IsDesignTimeCreatable=True}"
-                                        Command="{Binding DataContext.ExecuteCommandCommand, RelativeSource={RelativeSource AncestorType=Window}, d:Source={StaticResource DesignMainViewModel}}"
+                                        Command="{Binding DataContext.ExecuteCommandCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                        CommandParameter="{Binding}"
                                        Margin="5,3"
                                        HorizontalAlignment="Stretch"
                                        Style="{StaticResource SidebarButton}">
                                     <Button.ContextMenu>
-                                        <ContextMenu>
+                                        <ContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}">
                                             <MenuItem Header="Edit"
-                                                     Command="{Binding DataContext.EditCommandCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     Command="{Binding EditCommandCommand}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <MenuItem Header="Move Up"
-                                                     Command="{Binding DataContext.MoveCommandUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     Command="{Binding MoveCommandUpCommand}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <MenuItem Header="Move Down"
-                                                     Command="{Binding DataContext.MoveCommandDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     Command="{Binding MoveCommandDownCommand}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <Separator/>
                                             <MenuItem Header="Delete"
-                                                     Command="{Binding DataContext.RemoveCommandCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     Command="{Binding RemoveCommandCommand}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
