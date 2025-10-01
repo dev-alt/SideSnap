@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace SideSnap.Views;
 
-public partial class AddShortcutDialog : Window
+public partial class AddShortcutDialog
 {
     public string ShortcutName { get; private set; } = string.Empty;
     public string ShortcutPath { get; private set; } = string.Empty;
@@ -15,27 +15,24 @@ public partial class AddShortcutDialog : Window
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFileDialog
+        using var dialog = new FolderBrowserDialog();
+        dialog.Description = "Select a folder";
+        dialog.UseDescriptionForTitle = true;
+        dialog.ShowNewFolderButton = true;
+        dialog.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        var result = dialog.ShowDialog();
+        if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.SelectedPath))
         {
-            Title = "Select Folder or File",
-            Filter = "All Files (*.*)|*.*",
-            CheckFileExists = false,
-            CheckPathExists = true
-        };
-
-        // Try to use folder browser instead
-        using var folderDialog = new FolderBrowserDialog
-        {
-            Description = "Select a folder",
-            ShowNewFolderButton = true
-        };
-
-        if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-        {
-            PathTextBox.Text = folderDialog.SelectedPath;
+            PathTextBox.Text = dialog.SelectedPath;
             if (string.IsNullOrWhiteSpace(NameTextBox.Text))
             {
-                NameTextBox.Text = Path.GetFileName(folderDialog.SelectedPath);
+                var trimmed = dialog.SelectedPath.TrimEnd(Path.DirectorySeparatorChar);
+                var name = Path.GetFileName(trimmed);
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = trimmed;
+                }
+                NameTextBox.Text = name;
             }
         }
     }

@@ -201,12 +201,13 @@ public class WindowManagerService : IWindowManagerService
     {
         var monitors = new List<(IntPtr, Rect)>();
 
-    EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData) =>
-    {
-        monitors.Add((hMonitor, lprcMonitor));
-        return true;
-    }, IntPtr.Zero);
+        bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData)
+        {
+            monitors.Add((hMonitor, lprcMonitor));
+            return true;
+        }
 
+        EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, MonitorEnumProc, IntPtr.Zero);
         return monitors;
     }
 

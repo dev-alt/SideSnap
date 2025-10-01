@@ -81,9 +81,10 @@ public static class DragDropReorderBehavior
 
     private static void ItemsControl_Drop(object sender, System.Windows.DragEventArgs e)
     {
-        if (sender is ItemsControl itemsControl && e.Data.GetDataPresent(e.Data.GetFormats()[0]))
+         var formats = e.Data.GetFormats();
+        if (sender is ItemsControl itemsControl && formats is { Length: > 0 } && e.Data.GetDataPresent(formats[0]))
         {
-            var droppedData = e.Data.GetData(e.Data.GetFormats()[0]);
+            var droppedData = e.Data.GetData(formats[0]);
 
             // Find the target item
             var element = e.OriginalSource as DependencyObject;

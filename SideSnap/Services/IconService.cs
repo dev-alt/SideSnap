@@ -32,7 +32,7 @@ public class IconService(ILogger<IconService> logger) : IIconService
     }
 
     private const uint ShgfiIcon = 0x000000100;
-    private const uint ShgfiSmallicon = 0x000000001;
+    private const uint SHGFI_SMALLICON = 0x000000001;
     private const uint ShgfiLargeicon = 0x000000000;
     private const uint ShgfiUsefileattributes = 0x000000010;
     private const uint FileAttributeDirectory = 0x00000010;
@@ -127,7 +127,7 @@ public class IconService(ILogger<IconService> logger) : IIconService
     private ImageSource? ExtractIcon(string path, bool isFolder)
     {
         var shinfo = new Shfileinfo();
-        uint flags = ShgfiIcon | ShgfiSmallicon;
+        uint flags = ShgfiIcon | SHGFI_SMALLICON;
 
         if (isFolder && !Directory.Exists(path))
         {
@@ -173,7 +173,7 @@ public class IconService(ILogger<IconService> logger) : IIconService
             fileAttributes,
             ref shinfo,
             (uint)Marshal.SizeOf(shinfo),
-            ShgfiIcon | ShgfiSmallicon | ShgfiUsefileattributes);
+            ShgfiIcon | SHGFI_SMALLICON | ShgfiUsefileattributes);
 
         if (result == IntPtr.Zero)
             return null;

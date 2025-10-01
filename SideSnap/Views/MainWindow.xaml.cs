@@ -18,7 +18,7 @@ public partial class MainWindow : Window
     private readonly IServiceProvider _serviceProvider;
     private readonly ISettingsService _settingsService;
     private readonly DispatcherTimer _hideTimer;
-    private const int WmWindowposchanging = 0x0046;
+    private const int WmWindowPosChanging = 0x0046;
     private const double CollapsedWidth = 5;
     private const double ExpandedWidth = 105;
     private bool _isAutoHideEnabled;
@@ -86,7 +86,7 @@ public partial class MainWindow : Window
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (msg == WmWindowposchanging)
+        if (msg == WmWindowPosChanging)
         {
             var windowPos = Marshal.PtrToStructure<Windowpos>(lParam);
 
