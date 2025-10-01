@@ -11,62 +11,51 @@ public class WindowManagerService : IWindowManagerService
     private readonly string _positionsPath;
 
     // Win32 API imports
-    [DllImport("user32.dll")]
-    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
 
-    [DllImport("user32.dll")]
-    private static extern IntPtr FindWindow(string? lpClassName, string lpWindowName);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
 
-    [DllImport("user32.dll")]
-    private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+    [LibraryImport("user32.dll")]
+    private static partial uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-    [DllImport("user32.dll")]
-    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool IsWindowVisible(IntPtr hWnd);
 
-    [DllImport("user32.dll")]
-    private static extern bool IsWindowVisible(IntPtr hWnd);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool GetWindowRect(IntPtr hWnd, out Rect lpRect);
 
-    [DllImport("user32.dll")]
-    private static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
+    [LibraryImport("user32.dll")]
+    private static partial IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
 
-    [DllImport("user32.dll")]
-    private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
-
-    [DllImport("user32.dll")]
-    private static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
-
-    [DllImport("user32.dll")]
-    private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
-
-    [DllImport("user32.dll")]
-    private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, IntPtr dwData);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, IntPtr dwData);
 
     private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-    private delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
+    private delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
 
-    private const uint MONITOR_DEFAULTTONEAREST = 2;
+    private const uint MonitorDefaultToNearest = 0x00000002;
+    private const uint SwpNoSize = 0x0001;
+    private const uint SwpNoZOrder = 0x0004;
+    private const uint SwpShowWindow = 0x0040;
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct RECT
+    private readonly struct Rect
     {
-        public int Left;
-        public int Top;
-        public int Right;
-        public int Bottom;
-    }
+        public readonly int Left;
+        public readonly int Top;
+        public readonly int Right;
+        public readonly int Bottom;
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    private struct MONITORINFO
-    {
-        public int cbSize;
-        public RECT rcMonitor;
-        public RECT rcWork;
-        public uint dwFlags;
+        public int Width => Right - Left;
+        public int Height => Bottom - Top;
     }
-
-    private const uint SWP_NOSIZE = 0x0001;
-    private const uint SWP_NOZORDER = 0x0004;
-    private const uint SWP_SHOWWINDOW = 0x0040;
 
     public WindowManagerService()
     {
@@ -79,18 +68,16 @@ public class WindowManagerService : IWindowManagerService
     public List<WindowPosition> GetSavedPositions()
     {
         if (!File.Exists(_positionsPath))
-        {
-            return new List<WindowPosition>();
-        }
+            return [];
 
         try
         {
             var json = File.ReadAllText(_positionsPath);
-            return JsonSerializer.Deserialize<List<WindowPosition>>(json) ?? new List<WindowPosition>();
+            return JsonSerializer.Deserialize<List<WindowPosition>>(json) ?? [];
         }
         catch
         {
-            return new List<WindowPosition>();
+            return [];
         }
     }
 
@@ -118,13 +105,13 @@ public class WindowManagerService : IWindowManagerService
         var positions = GetSavedPositions();
         var position = positions.FirstOrDefault(p => p.ProcessName == processName);
 
-        if (position != null)
+        if (position is null)
+            return;
+
+        var hwnd = FindWindowByProcessName(processName);
+        if (hwnd != IntPtr.Zero)
         {
-            var hwnd = FindWindowByProcessName(processName);
-            if (hwnd != IntPtr.Zero)
-            {
-                SetWindowPos(hwnd, IntPtr.Zero, position.X, position.Y, position.Width, position.Height, SWP_NOZORDER | SWP_SHOWWINDOW);
-            }
+            SetWindowPos(hwnd, IntPtr.Zero, position.X, position.Y, position.Width, position.Height, SwpNoZOrder | SwpShowWindow);
         }
     }
 
@@ -132,25 +119,26 @@ public class WindowManagerService : IWindowManagerService
     {
         IntPtr foundWindow = IntPtr.Zero;
 
-        EnumWindows((hWnd, lParam) =>
+        EnumWindows((hWnd, _) =>
         {
-            if (IsWindowVisible(hWnd))
+            if (!IsWindowVisible(hWnd))
+                return true; // Continue enumeration
+
+            GetWindowThreadProcessId(hWnd, out uint processId);
+            try
             {
-                GetWindowThreadProcessId(hWnd, out uint processId);
-                try
+                var process = Process.GetProcessById((int)processId);
+                if (process.ProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase))
                 {
-                    var process = Process.GetProcessById((int)processId);
-                    if (process.ProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        foundWindow = hWnd;
-                        return false; // Stop enumeration
-                    }
-                }
-                catch
-                {
-                    // Process may have exited
+                    foundWindow = hWnd;
+                    return false; // Stop enumeration
                 }
             }
+            catch
+            {
+                // Process may have exited
+            }
+
             return true; // Continue enumeration
         }, IntPtr.Zero);
 
@@ -166,42 +154,39 @@ public class WindowManagerService : IWindowManagerService
     public WindowPosition? GetCurrentWindowPosition(string processName)
     {
         var hwnd = FindWindowByProcessName(processName);
-        if (hwnd != IntPtr.Zero && GetWindowRect(hwnd, out RECT rect))
+        if (hwnd == IntPtr.Zero || !GetWindowRect(hwnd, out Rect rect))
+            return null;
+
+        var monitorIndex = GetMonitorIndex(hwnd);
+        return new WindowPosition
         {
-            var monitorIndex = GetMonitorIndex(hwnd);
-            return new WindowPosition
-            {
-                ProcessName = processName,
-                X = rect.Left,
-                Y = rect.Top,
-                Width = rect.Right - rect.Left,
-                Height = rect.Bottom - rect.Top,
-                Monitor = monitorIndex
-            };
-        }
-        return null;
+            ProcessName = processName,
+            X = rect.Left,
+            Y = rect.Top,
+            Width = rect.Width,
+            Height = rect.Height,
+            Monitor = monitorIndex
+        };
     }
 
     private int GetMonitorIndex(IntPtr hwnd)
     {
-        var hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+        var hMonitor = MonitorFromWindow(hwnd, MonitorDefaultToNearest);
         var monitors = GetAllMonitors();
 
         for (int i = 0; i < monitors.Count; i++)
         {
-            if (monitors[i].Item1 == hMonitor)
-            {
+            if (monitors[i].Handle == hMonitor)
                 return i;
-            }
         }
         return 0;
     }
 
-    private List<(IntPtr, RECT)> GetAllMonitors()
+    private List<(IntPtr Handle, Rect Bounds)> GetAllMonitors()
     {
-        var monitors = new List<(IntPtr, RECT)>();
+        var monitors = new List<(IntPtr, Rect)>();
 
-        EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (hMonitor, hdcMonitor, ref RECT lprcMonitor, dwData) =>
+        EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr hMonitor, IntPtr _, ref Rect lprcMonitor, IntPtr _) =>
         {
             monitors.Add((hMonitor, lprcMonitor));
             return true;
@@ -212,31 +197,25 @@ public class WindowManagerService : IWindowManagerService
 
     public List<(int Index, int X, int Y, int Width, int Height)> GetMonitorInfo()
     {
-        var result = new List<(int, int, int, int, int)>();
         var monitors = GetAllMonitors();
-
-        for (int i = 0; i < monitors.Count; i++)
-        {
-            var (hMonitor, rect) = monitors[i];
-            result.Add((i, rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top));
-        }
-
-        return result;
+        return monitors
+            .Select((m, index) => (index, m.Bounds.Left, m.Bounds.Top, m.Bounds.Width, m.Bounds.Height))
+            .ToList();
     }
 
     public void MoveWindow(string processName, int x, int y, int? width = null, int? height = null)
     {
         var hwnd = FindWindowByProcessName(processName);
-        if (hwnd != IntPtr.Zero)
+        if (hwnd == IntPtr.Zero)
+            return;
+
+        if (width.HasValue && height.HasValue)
         {
-            if (width.HasValue && height.HasValue)
-            {
-                SetWindowPos(hwnd, IntPtr.Zero, x, y, width.Value, height.Value, SWP_NOZORDER | SWP_SHOWWINDOW);
-            }
-            else
-            {
-                SetWindowPos(hwnd, IntPtr.Zero, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW);
-            }
+            SetWindowPos(hwnd, IntPtr.Zero, x, y, width.Value, height.Value, SwpNoZOrder | SwpShowWindow);
+        }
+        else
+        {
+            SetWindowPos(hwnd, IntPtr.Zero, x, y, 0, 0, SwpNoSize | SwpNoZOrder | SwpShowWindow);
         }
     }
 }
