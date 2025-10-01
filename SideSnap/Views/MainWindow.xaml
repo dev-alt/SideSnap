@@ -1,0 +1,212 @@
+<Window x:Class="SideSnap.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:utils="clr-namespace:SideSnap.Utils"
+        mc:Ignorable="d"
+        Title="SideSnap"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        Topmost="True"
+        ShowInTaskbar="False"
+        Left="0"
+        Top="0"
+        Width="105"
+        Height="{Binding Source={x:Static SystemParameters.PrimaryScreenHeight}}"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        DragOver="Window_DragOver">
+
+    <Border Background="#F0F0F0"
+            BorderBrush="#CCCCCC"
+            BorderThickness="0,0,1,0"
+            CornerRadius="0,8,8,0">
+        <Border.Effect>
+            <DropShadowEffect ShadowDepth="2" BlurRadius="10" Opacity="0.3"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="48"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header with Exit Button -->
+            <Border Grid.Row="0" Background="#2C3E50" Height="32">
+                <Button Content="✕"
+                       Click="ExitButton_Click"
+                       Foreground="White"
+                       Background="#E74C3C"
+                       BorderThickness="0"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Width="32"
+                       Height="32"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Top"
+                       Cursor="Hand"
+                       Padding="0">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="#E74C3C"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}"
+                                               CornerRadius="0,8,0,0">
+                                            <ContentPresenter HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#C0392B"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="#A93226"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Border>
+
+            <!-- Content Area -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,5,0,0">
+                <StackPanel Margin="5">
+
+                    <!-- Shortcuts Section -->
+                    <TextBlock Text="Folders"
+                              FontWeight="Bold"
+                              FontSize="10"
+                              Foreground="#7F8C8D"
+                              Margin="5,5,5,5"/>
+
+                    <ItemsControl ItemsSource="{Binding Shortcuts}" utils:DragDropReorderBehavior.IsEnabled="True">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.OpenShortcutCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       CommandParameter="{Binding}"
+                                       Margin="5,3"
+                                       HorizontalAlignment="Stretch"
+                                       Style="{StaticResource SidebarButton}">
+                                    <Button.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Edit"
+                                                     Command="{Binding DataContext.EditShortcutCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     CommandParameter="{Binding}"/>
+                                            <MenuItem Header="Move Up"
+                                                     Command="{Binding DataContext.MoveShortcutUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     CommandParameter="{Binding}"/>
+                                            <MenuItem Header="Move Down"
+                                                     Command="{Binding DataContext.MoveShortcutDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     CommandParameter="{Binding}"/>
+                                            <Separator/>
+                                            <MenuItem Header="Delete"
+                                                     Command="{Binding DataContext.RemoveShortcutCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     CommandParameter="{Binding}"/>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                        <Image Source="{Binding Path, Converter={StaticResource PathToIconConverter}}"
+                                              Width="32"
+                                              Height="32"
+                                              Margin="0,0,0,5"
+                                              RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <TextBlock Text="{Binding Name}"
+                                                  TextWrapping="Wrap"
+                                                  TextAlignment="Center"
+                                                  FontSize="9"
+                                                  MaxWidth="75"/>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Button Content="+"
+                           Command="{Binding AddShortcutCommand}"
+                           Margin="5,5,5,10"
+                           Style="{StaticResource AddButton}"/>
+
+                    <!-- Commands Section -->
+                    <TextBlock Text="Commands"
+                              FontWeight="Bold"
+                              FontSize="10"
+                              Foreground="#7F8C8D"
+                              Margin="5,10,5,5"/>
+
+                    <ItemsControl ItemsSource="{Binding Commands}" utils:DragDropReorderBehavior.IsEnabled="True">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.ExecuteCommandCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                       CommandParameter="{Binding}"
+                                       Margin="5,3"
+                                       HorizontalAlignment="Stretch"
+                                       Style="{StaticResource SidebarButton}">
+                                    <Button.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Edit"
+                                                     Command="{Binding DataContext.EditCommandCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     CommandParameter="{Binding}"/>
+                                            <MenuItem Header="Move Up"
+                                                     Command="{Binding DataContext.MoveCommandUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     CommandParameter="{Binding}"/>
+                                            <MenuItem Header="Move Down"
+                                                     Command="{Binding DataContext.MoveCommandDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     CommandParameter="{Binding}"/>
+                                            <Separator/>
+                                            <MenuItem Header="Delete"
+                                                     Command="{Binding DataContext.RemoveCommandCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     CommandParameter="{Binding}"/>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                        <TextBlock Text="⚡"
+                                                  FontSize="28"
+                                                  TextAlignment="Center"
+                                                  Margin="0,0,0,5"/>
+                                        <TextBlock Text="{Binding Name}"
+                                                  TextWrapping="Wrap"
+                                                  TextAlignment="Center"
+                                                  FontSize="9"
+                                                  MaxWidth="75"/>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Button Content="+"
+                           Command="{Binding AddCommandCommand}"
+                           Margin="5,5,5,10"
+                           Style="{StaticResource AddButton}"/>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Settings Button (above taskbar) -->
+            <Border Grid.Row="2" Background="#34495E" Padding="5">
+                <Button Content="⚙ Settings"
+                       Click="SettingsButton_Click"
+                       Foreground="White"
+                       Background="Transparent"
+                       BorderThickness="0"
+                       FontSize="11"
+                       HorizontalAlignment="Center"
+                       Cursor="Hand"/>
+            </Border>
+
+            <!-- Taskbar Spacer (transparent and click-through) -->
+            <Border Grid.Row="3" Background="Transparent" IsHitTestVisible="False"/>
+        </Grid>
+    </Border>
+</Window>

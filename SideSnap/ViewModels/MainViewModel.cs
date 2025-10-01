@@ -1,0 +1,362 @@
+using System.Collections.ObjectModel;
+using System.IO;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using SideSnap.Models;
+using SideSnap.Services;
+using SideSnap.Views;
+
+namespace SideSnap.ViewModels;
+
+public partial class MainViewModel : ViewModelBase
+{
+    private readonly ISettingsService _settingsService;
+    private readonly ICommandExecutorService _commandExecutor;
+    private readonly IWindowManagerService _windowManager;
+    private readonly IShortcutService _shortcutService;
+    private readonly ITrayService _trayService;
+    private readonly ILogger<MainViewModel> _logger;
+    private readonly IServiceProvider _serviceProvider;
+
+    [ObservableProperty]
+    private bool _isExpanded;
+
+    [ObservableProperty]
+    private double _sidebarWidth = 250;
+
+    [ObservableProperty]
+    private ObservableCollection<FolderShortcut> _shortcuts = new();
+
+    [ObservableProperty]
+    private ObservableCollection<PowerShellCommand> _commands = new();
+
+    public MainViewModel(
+        ISettingsService settingsService,
+        ICommandExecutorService commandExecutor,
+        IWindowManagerService windowManager,
+        IShortcutService shortcutService,
+        ITrayService trayService,
+        ILogger<MainViewModel> logger,
+        IServiceProvider serviceProvider)
+    {
+        _settingsService = settingsService;
+        _commandExecutor = commandExecutor;
+        _windowManager = windowManager;
+        _shortcutService = shortcutService;
+        _trayService = trayService;
+        _logger = logger;
+        _serviceProvider = serviceProvider;
+
+        LoadSettings();
+        LoadShortcuts();
+        LoadCommands();
+    }
+
+    [RelayCommand]
+    private void ToggleSidebar()
+    {
+        IsExpanded = !IsExpanded;
+    }
+
+    [RelayCommand]
+    private async Task OpenShortcut(FolderShortcut? shortcut)
+    {
+        if (shortcut != null)
+        {
+            await _shortcutService.OpenFolderAsync(shortcut.Path);
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExecuteCommand(PowerShellCommand? command)
+    {
+        if (command != null)
+        {
+            await _commandExecutor.ExecuteAsync(command);
+        }
+    }
+
+    [RelayCommand]
+    private void AddShortcut()
+    {
+        var dialog = _serviceProvider.GetRequiredService<AddShortcutDialog>();
+        if (dialog.ShowDialog() == true)
+        {
+            var shortcut = new FolderShortcut
+            {
+                Name = dialog.ShortcutName,
+                Path = dialog.ShortcutPath,
+                Order = Shortcuts.Count
+            };
+
+            Shortcuts.Add(shortcut);
+            SaveShortcuts();
+            _logger.LogInformation("Added shortcut via dialog: {Name} -> {Path}", shortcut.Name, shortcut.Path);
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveShortcut(FolderShortcut? shortcut)
+    {
+        if (shortcut != null)
+        {
+            Shortcuts.Remove(shortcut);
+            SaveShortcuts();
+            _logger.LogInformation("Removed shortcut: {Name}", shortcut.Name);
+        }
+    }
+
+    [RelayCommand]
+    private void EditShortcut(FolderShortcut? shortcut)
+    {
+        if (shortcut == null) return;
+
+        var dialog = _serviceProvider.GetRequiredService<AddShortcutDialog>();
+        // Pre-populate with existing values
+        dialog.Title = "Edit Shortcut";
+        dialog.Loaded += (_, _) =>
+        {
+            var nameBox = dialog.FindName("NameTextBox") as System.Windows.Controls.TextBox;
+            var pathBox = dialog.FindName("PathTextBox") as System.Windows.Controls.TextBox;
+            if (nameBox != null) nameBox.Text = shortcut.Name;
+            if (pathBox != null) pathBox.Text = shortcut.Path;
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            shortcut.Name = dialog.ShortcutName;
+            shortcut.Path = dialog.ShortcutPath;
+            SaveShortcuts();
+            // Force UI refresh
+            var index = Shortcuts.IndexOf(shortcut);
+            Shortcuts.RemoveAt(index);
+            Shortcuts.Insert(index, shortcut);
+            _logger.LogInformation("Edited shortcut: {Name}", shortcut.Name);
+        }
+    }
+
+    [RelayCommand]
+    private void MoveShortcutUp(FolderShortcut? shortcut)
+    {
+        if (shortcut == null) return;
+        var index = Shortcuts.IndexOf(shortcut);
+        if (index > 0)
+        {
+            Shortcuts.Move(index, index - 1);
+            ReorderShortcuts();
+            SaveShortcuts();
+            _logger.LogDebug("Moved shortcut up: {Name}", shortcut.Name);
+        }
+    }
+
+    [RelayCommand]
+    private void MoveShortcutDown(FolderShortcut? shortcut)
+    {
+        if (shortcut == null) return;
+        var index = Shortcuts.IndexOf(shortcut);
+        if (index < Shortcuts.Count - 1)
+        {
+            Shortcuts.Move(index, index + 1);
+            ReorderShortcuts();
+            SaveShortcuts();
+            _logger.LogDebug("Moved shortcut down: {Name}", shortcut.Name);
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveCommand(PowerShellCommand? command)
+    {
+        if (command != null)
+        {
+            Commands.Remove(command);
+            _commandExecutor.SaveCommands(Commands);
+            _logger.LogInformation("Removed command: {Name}", command.Name);
+        }
+    }
+
+    [RelayCommand]
+    private void AddCommand()
+    {
+        var dialog = _serviceProvider.GetRequiredService<AddCommandDialog>();
+        if (dialog.ShowDialog() == true)
+        {
+            var command = new PowerShellCommand
+            {
+                Name = dialog.CommandName,
+                Command = dialog.CommandText,
+                RunHidden = dialog.RunHidden,
+                RequiresElevation = dialog.RequiresElevation,
+                IsFavorite = dialog.IsFavorite
+            };
+
+            Commands.Add(command);
+            _commandExecutor.SaveCommands(Commands);
+            _logger.LogInformation("Added command via dialog: {Name}", command.Name);
+        }
+    }
+
+    [RelayCommand]
+    private void EditCommand(PowerShellCommand? command)
+    {
+        if (command == null) return;
+
+        var dialog = _serviceProvider.GetRequiredService<AddCommandDialog>();
+        dialog.Title = "Edit PowerShell Command";
+        dialog.Loaded += (_, _) =>
+        {
+            var nameBox = dialog.FindName("NameTextBox") as System.Windows.Controls.TextBox;
+            var commandBox = dialog.FindName("CommandTextBox") as System.Windows.Controls.TextBox;
+            var runHiddenCheck = dialog.FindName("RunHiddenCheckBox") as System.Windows.Controls.CheckBox;
+            var elevationCheck = dialog.FindName("RequiresElevationCheckBox") as System.Windows.Controls.CheckBox;
+            var favoriteCheck = dialog.FindName("IsFavoriteCheckBox") as System.Windows.Controls.CheckBox;
+
+            if (nameBox != null) nameBox.Text = command.Name;
+            if (commandBox != null) commandBox.Text = command.Command;
+            if (runHiddenCheck != null) runHiddenCheck.IsChecked = command.RunHidden;
+            if (elevationCheck != null) elevationCheck.IsChecked = command.RequiresElevation;
+            if (favoriteCheck != null) favoriteCheck.IsChecked = command.IsFavorite;
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            command.Name = dialog.CommandName;
+            command.Command = dialog.CommandText;
+            command.RunHidden = dialog.RunHidden;
+            command.RequiresElevation = dialog.RequiresElevation;
+            command.IsFavorite = dialog.IsFavorite;
+
+            _commandExecutor.SaveCommands(Commands);
+            // Force UI refresh
+            var index = Commands.IndexOf(command);
+            Commands.RemoveAt(index);
+            Commands.Insert(index, command);
+            _logger.LogInformation("Edited command: {Name}", command.Name);
+        }
+    }
+
+    [RelayCommand]
+    private void MoveCommandUp(PowerShellCommand? command)
+    {
+        if (command == null) return;
+        var index = Commands.IndexOf(command);
+        if (index > 0)
+        {
+            Commands.Move(index, index - 1);
+            _commandExecutor.SaveCommands(Commands);
+            _logger.LogDebug("Moved command up: {Name}", command.Name);
+        }
+    }
+
+    [RelayCommand]
+    private void MoveCommandDown(PowerShellCommand? command)
+    {
+        if (command == null) return;
+        var index = Commands.IndexOf(command);
+        if (index < Commands.Count - 1)
+        {
+            Commands.Move(index, index + 1);
+            _commandExecutor.SaveCommands(Commands);
+            _logger.LogDebug("Moved command down: {Name}", command.Name);
+        }
+    }
+
+    private void ReorderShortcuts()
+    {
+        for (int i = 0; i < Shortcuts.Count; i++)
+        {
+            Shortcuts[i].Order = i;
+        }
+    }
+
+    private void LoadSettings()
+    {
+        var settings = _settingsService.LoadSettings();
+        SidebarWidth = settings.SidebarWidth;
+    }
+
+    private void LoadShortcuts()
+    {
+        var shortcuts = _shortcutService.GetShortcuts();
+        Shortcuts = new ObservableCollection<FolderShortcut>(shortcuts);
+
+        // Listen to collection changes to auto-save when reordering
+        Shortcuts.CollectionChanged += (_, e) =>
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
+            {
+                ReorderShortcuts();
+                SaveShortcuts();
+                _logger.LogDebug("Shortcuts reordered via drag-drop");
+            }
+        };
+    }
+
+    private void LoadCommands()
+    {
+        var commands = _commandExecutor.GetCommands();
+        Commands = new ObservableCollection<PowerShellCommand>(commands);
+
+        // Listen to collection changes to auto-save when reordering
+        Commands.CollectionChanged += (_, e) =>
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
+            {
+                _commandExecutor.SaveCommands(Commands);
+                _logger.LogDebug("Commands reordered via drag-drop");
+            }
+        };
+    }
+
+    private void SaveShortcuts()
+    {
+        _shortcutService.SaveShortcuts(Shortcuts);
+    }
+
+    public void AddDroppedFolder(string path)
+    {
+        var name = Path.GetFileName(path);
+        var shortcut = new FolderShortcut
+        {
+            Name = name,
+            Path = path,
+            Order = Shortcuts.Count
+        };
+
+        Shortcuts.Add(shortcut);
+        SaveShortcuts();
+        _logger.LogInformation("Added folder shortcut: {Name} -> {Path}", name, path);
+    }
+
+    public void AddDroppedExecutable(string path)
+    {
+        var name = Path.GetFileNameWithoutExtension(path);
+        var command = new PowerShellCommand
+        {
+            Name = name,
+            Command = $"Start-Process '{path}'",
+            RunHidden = false
+        };
+
+        Commands.Add(command);
+        _commandExecutor.SaveCommands(Commands);
+        _logger.LogInformation("Added executable command: {Name} -> {Path}", name, path);
+    }
+
+    public void AddDroppedShortcut(string path)
+    {
+        // For .lnk files, treat as folder shortcut
+        var name = Path.GetFileNameWithoutExtension(path);
+        var shortcut = new FolderShortcut
+        {
+            Name = name,
+            Path = path,
+            Order = Shortcuts.Count
+        };
+
+        Shortcuts.Add(shortcut);
+        SaveShortcuts();
+        _logger.LogInformation("Added shortcut: {Name} -> {Path}", name, path);
+    }
+}
