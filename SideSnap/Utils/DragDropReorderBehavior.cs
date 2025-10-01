@@ -41,10 +41,10 @@ public static class DragDropReorderBehavior
         }
     }
 
-    private static System.Windows.Point? _startPoint;
+    private static Point? _startPoint;
     private static object? _draggedItem;
 
-    private static void ItemsControl_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private static void ItemsControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         _startPoint = e.GetPosition(null);
 
@@ -61,17 +61,17 @@ public static class DragDropReorderBehavior
         }
     }
 
-    private static void ItemsControl_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+    private static void ItemsControl_PreviewMouseMove(object sender, MouseEventArgs e)
     {
         if (e.LeftButton == MouseButtonState.Pressed && _startPoint.HasValue && _draggedItem != null)
         {
-            System.Windows.Point currentPosition = e.GetPosition(null);
-            System.Windows.Vector diff = _startPoint.Value - currentPosition;
+            Point currentPosition = e.GetPosition(null);
+            Vector diff = _startPoint.Value - currentPosition;
 
             if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
                 Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
             {
-                System.Windows.DragDrop.DoDragDrop((DependencyObject)sender, _draggedItem, System.Windows.DragDropEffects.Move);
+                DragDrop.DoDragDrop((DependencyObject)sender, _draggedItem, DragDropEffects.Move);
                 _draggedItem = null;
                 _startPoint = null;
             }

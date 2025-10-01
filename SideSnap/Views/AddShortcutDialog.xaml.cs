@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace SideSnap.Views;
 
-public partial class AddShortcutDialog : Window
+public partial class AddShortcutDialog
 {
     public string ShortcutName { get; private set; } = string.Empty;
     public string ShortcutPath { get; private set; } = string.Empty;
@@ -15,12 +15,10 @@ public partial class AddShortcutDialog : Window
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)
     {
-        using var dialog = new System.Windows.Forms.FolderBrowserDialog
-        {
-            Description = "Select a folder",
-            ShowNewFolderButton = true,
-            SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
-        };
+        using var dialog = new System.Windows.Forms.FolderBrowserDialog();
+        dialog.Description = "Select a folder";
+        dialog.ShowNewFolderButton = true;
+        dialog.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
         if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.SelectedPath))
         {

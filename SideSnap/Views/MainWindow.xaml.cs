@@ -12,20 +12,20 @@ using SideSnap.ViewModels;
 
 namespace SideSnap.Views;
 
-public partial class MainWindow : Window
+public partial class MainWindow
 {
     private readonly ILogger<MainWindow> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly ISettingsService _settingsService;
     private readonly DispatcherTimer _hideTimer;
-    private const int WM_WINDOWPOSCHANGING = 0x0046;
+    private const int WmWindowPosChanging = 0x0046;
     private const double CollapsedWidth = 5;
     private const double ExpandedWidth = 105;
     private bool _isAutoHideEnabled;
     private bool _isExpanded = true;
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct WINDOWPOS
+    private struct WindowPos
     {
         public IntPtr hwnd;
         public IntPtr hwndInsertAfter;
@@ -86,9 +86,9 @@ public partial class MainWindow : Window
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (msg == WM_WINDOWPOSCHANGING)
+        if (msg == WmWindowPosChanging)
         {
-            var windowPos = Marshal.PtrToStructure<WINDOWPOS>(lParam);
+            var windowPos = Marshal.PtrToStructure<WindowPos>(lParam);
 
             // Lock position to (0, 0) but allow width changes for auto-hide
             if (windowPos.x != 0 || windowPos.y != 0)
@@ -124,28 +124,28 @@ public partial class MainWindow : Window
         System.Windows.Application.Current.Shutdown();
     }
 
-    private void Window_DragOver(object sender, System.Windows.DragEventArgs e)
+    private void Window_DragOver(object sender, DragEventArgs e)
     {
-        if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
         {
-            e.Effects = System.Windows.DragDropEffects.Copy;
+            e.Effects = DragDropEffects.Copy;
         }
         else
         {
-            e.Effects = System.Windows.DragDropEffects.None;
+            e.Effects = DragDropEffects.None;
         }
         e.Handled = true;
     }
 
-    private void Window_Drop(object sender, System.Windows.DragEventArgs e)
+    private void Window_Drop(object sender, DragEventArgs e)
     {
-        if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
         {
-            var files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
-            if (files != null && files.Length > 0)
+            var files = (string[]?)e.Data.GetData(DataFormats.FileDrop);
+            if (files is { Length: > 0 })
             {
                 var viewModel = DataContext as MainViewModel;
-                if (viewModel != null)
+                if (viewModel is not null)
                 {
                     foreach (var file in files)
                     {

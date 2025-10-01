@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,9 +14,7 @@ public partial class MainViewModel : ViewModelBase
 {
     private readonly ISettingsService _settingsService;
     private readonly ICommandExecutorService _commandExecutor;
-    private readonly IWindowManagerService _windowManager;
     private readonly IShortcutService _shortcutService;
-    private readonly ITrayService _trayService;
     private readonly ILogger<MainViewModel> _logger;
     private readonly IServiceProvider _serviceProvider;
 
@@ -36,17 +33,13 @@ public partial class MainViewModel : ViewModelBase
     public MainViewModel(
         ISettingsService settingsService,
         ICommandExecutorService commandExecutor,
-        IWindowManagerService windowManager,
         IShortcutService shortcutService,
-        ITrayService trayService,
         ILogger<MainViewModel> logger,
         IServiceProvider serviceProvider)
     {
         _settingsService = settingsService;
         _commandExecutor = commandExecutor;
-        _windowManager = windowManager;
         _shortcutService = shortcutService;
-        _trayService = trayService;
         _logger = logger;
         _serviceProvider = serviceProvider;
 
@@ -64,19 +57,13 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task OpenShortcut(FolderShortcut shortcut)
     {
-        if (shortcut != null)
-        {
-            await _shortcutService.OpenFolderAsync(shortcut.Path);
-        }
+        await _shortcutService.OpenFolderAsync(shortcut.Path);
     }
 
     [RelayCommand]
     private async Task ExecuteCommand(PowerShellCommand command)
     {
-        if (command != null)
-        {
-            await _commandExecutor.ExecuteAsync(command);
-        }
+        await _commandExecutor.ExecuteAsync(command);
     }
 
     [RelayCommand]
@@ -101,12 +88,9 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void RemoveShortcut(FolderShortcut shortcut)
     {
-        if (shortcut != null)
-        {
-            Shortcuts.Remove(shortcut);
-            SaveShortcuts();
-            _logger.LogInformation("Removed shortcut: {Name}", shortcut.Name);
-        }
+        Shortcuts.Remove(shortcut);
+        SaveShortcuts();
+        _logger.LogInformation("Removed shortcut: {Name}", shortcut.Name);
     }
 
     [RelayCommand]
@@ -117,7 +101,7 @@ public partial class MainViewModel : ViewModelBase
         var dialog = _serviceProvider.GetRequiredService<AddShortcutDialog>();
         // Pre-populate with existing values
         dialog.Title = "Edit Shortcut";
-        dialog.Loaded += (s, e) =>
+        dialog.Loaded += (_, _) =>
         {
             var nameBox = dialog.FindName("NameTextBox") as System.Windows.Controls.TextBox;
             var pathBox = dialog.FindName("PathTextBox") as System.Windows.Controls.TextBox;
@@ -169,12 +153,9 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void RemoveCommand(PowerShellCommand command)
     {
-        if (command != null)
-        {
-            Commands.Remove(command);
-            _commandExecutor.SaveCommands(Commands);
-            _logger.LogInformation("Removed command: {Name}", command.Name);
-        }
+        Commands.Remove(command);
+        _commandExecutor.SaveCommands(Commands);
+        _logger.LogInformation("Removed command: {Name}", command.Name);
     }
 
     [RelayCommand]
@@ -205,7 +186,7 @@ public partial class MainViewModel : ViewModelBase
 
         var dialog = _serviceProvider.GetRequiredService<AddCommandDialog>();
         dialog.Title = "Edit PowerShell Command";
-        dialog.Loaded += (s, e) =>
+        dialog.Loaded += (_, _) =>
         {
             var nameBox = dialog.FindName("NameTextBox") as System.Windows.Controls.TextBox;
             var commandBox = dialog.FindName("CommandTextBox") as System.Windows.Controls.TextBox;
@@ -283,7 +264,7 @@ public partial class MainViewModel : ViewModelBase
         Shortcuts = new ObservableCollection<FolderShortcut>(shortcuts);
 
         // Listen to collection changes to auto-save when reordering
-        Shortcuts.CollectionChanged += (s, e) =>
+        Shortcuts.CollectionChanged += (_, e) =>
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
             {
@@ -300,7 +281,7 @@ public partial class MainViewModel : ViewModelBase
         Commands = new ObservableCollection<PowerShellCommand>(commands);
 
         // Listen to collection changes to auto-save when reordering
-        Commands.CollectionChanged += (s, e) =>
+        Commands.CollectionChanged += (_, e) =>
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
             {
