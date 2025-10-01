@@ -9,7 +9,7 @@ using SideSnap.Views;
 
 namespace SideSnap;
 
-public partial class App : System.Windows.Application
+public partial class App
 {
     private ServiceProvider? _serviceProvider;
 
