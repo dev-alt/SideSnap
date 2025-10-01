@@ -89,6 +89,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
                                           Text="{Binding Type}"
@@ -102,6 +103,19 @@
                                     <TextBlock Text="{Binding Path}" FontSize="10" Foreground="#7F8C8D" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
                                 <Button Grid.Column="2"
+                                       Content="✎"
+                                       Click="EditItemButton_Click"
+                                       Tag="{Binding}"
+                                       Width="24"
+                                       Height="24"
+                                       Background="#3498DB"
+                                       Foreground="White"
+                                       BorderThickness="0"
+                                       FontSize="12"
+                                       Cursor="Hand"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,5,0"/>
+                                <Button Grid.Column="3"
                                        Content="✕"
                                        Click="RemoveItemButton_Click"
                                        Tag="{Binding}"

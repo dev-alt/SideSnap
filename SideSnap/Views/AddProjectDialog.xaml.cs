@@ -202,6 +202,95 @@ public partial class AddProjectDialog : Window
         inputDialog.ShowDialog();
     }
 
+    private void EditItemButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is System.Windows.Controls.Button button && button.Tag is ProjectItem item)
+        {
+            var inputDialog = new Window
+            {
+                Title = $"Edit {item.Type}",
+                Width = 450,
+                Height = 200,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = this,
+                ResizeMode = ResizeMode.NoResize
+            };
+
+            var grid = new Grid { Margin = new Thickness(20) };
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+            var nameLabel = new TextBlock { Text = "Name:", Margin = new Thickness(0, 0, 0, 5) };
+            var nameBox = new System.Windows.Controls.TextBox
+            {
+                Text = item.Name,
+                Margin = new Thickness(0, 0, 0, 15),
+                Padding = new Thickness(5)
+            };
+
+            var buttonPanel = new StackPanel
+            {
+                Orientation = System.Windows.Controls.Orientation.Horizontal,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Right
+            };
+
+            var okButton = new System.Windows.Controls.Button
+            {
+                Content = "Save",
+                Width = 80,
+                Height = 30,
+                Margin = new Thickness(0, 0, 10, 0)
+            };
+
+            var cancelButton = new System.Windows.Controls.Button
+            {
+                Content = "Cancel",
+                Width = 80,
+                Height = 30
+            };
+
+            okButton.Click += (_, _) =>
+            {
+                if (!string.IsNullOrWhiteSpace(nameBox.Text))
+                {
+                    item.Name = nameBox.Text;
+                    // Force refresh of the ListBox
+                    var index = Items.IndexOf(item);
+                    Items.RemoveAt(index);
+                    Items.Insert(index, item);
+                    inputDialog.DialogResult = true;
+                    inputDialog.Close();
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("Please enter a name.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            };
+
+            cancelButton.Click += (_, _) =>
+            {
+                inputDialog.DialogResult = false;
+                inputDialog.Close();
+            };
+
+            buttonPanel.Children.Add(okButton);
+            buttonPanel.Children.Add(cancelButton);
+
+            Grid.SetRow(nameLabel, 0);
+            Grid.SetRow(nameBox, 1);
+            Grid.SetRow(buttonPanel, 3);
+
+            grid.Children.Add(nameLabel);
+            grid.Children.Add(nameBox);
+            grid.Children.Add(buttonPanel);
+
+            inputDialog.Content = grid;
+            inputDialog.ShowDialog();
+        }
+    }
+
     private void RemoveItemButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is System.Windows.Controls.Button button && button.Tag is ProjectItem item)

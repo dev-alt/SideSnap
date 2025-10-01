@@ -211,7 +211,6 @@
                                     <Popup x:Name="ProjectDropdown"
                                            PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=Button}}"
                                            Placement="Right"
-                                           IsOpen="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
                                            StaysOpen="False"
                                            AllowsTransparency="True"
                                            HorizontalOffset="5">
