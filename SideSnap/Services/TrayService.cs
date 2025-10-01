@@ -1,5 +1,3 @@
-using System.Windows.Forms;
-
 namespace SideSnap.Services;
 
 public class TrayService : ITrayService, IDisposable
@@ -11,7 +9,7 @@ public class TrayService : ITrayService, IDisposable
     {
         _notifyIcon = new NotifyIcon
         {
-            Icon = System.Drawing.SystemIcons.Application,
+            Icon = SystemIcons.Application,
             Text = "SideSnap",
             Visible = true
         };

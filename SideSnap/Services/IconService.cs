@@ -214,7 +214,7 @@ public class IconService : IIconService
         };
 
         visual.Measure(new System.Windows.Size(16, 16));
-        visual.Arrange(new System.Windows.Rect(0, 0, 16, 16));
+        visual.Arrange(new Rect(0, 0, 16, 16));
         bitmap.Render(visual);
         bitmap.Freeze();
 

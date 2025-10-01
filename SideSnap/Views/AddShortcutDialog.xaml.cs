@@ -15,7 +15,7 @@ public partial class AddShortcutDialog
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)
     {
-        using var dialog = new System.Windows.Forms.FolderBrowserDialog();
+        using var dialog = new FolderBrowserDialog();
         dialog.Description = "Select a folder";
         dialog.ShowNewFolderButton = true;
         dialog.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
