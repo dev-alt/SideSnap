@@ -79,7 +79,8 @@ public partial class MainViewModel : ViewModelBase
             {
                 Name = dialog.ShortcutName,
                 Path = dialog.ShortcutPath,
-                Order = Shortcuts.Count
+                Order = Shortcuts.Count,
+                ShowLabel = dialog.ShowLabel
             };
 
             Shortcuts.Add(shortcut);
@@ -110,14 +111,17 @@ public partial class MainViewModel : ViewModelBase
         {
             var nameBox = dialog.FindName("NameTextBox") as System.Windows.Controls.TextBox;
             var pathBox = dialog.FindName("PathTextBox") as System.Windows.Controls.TextBox;
+            var showLabelCheck = dialog.FindName("ShowLabelCheckBox") as System.Windows.Controls.CheckBox;
             if (nameBox != null) nameBox.Text = shortcut.Name;
             if (pathBox != null) pathBox.Text = shortcut.Path;
+            if (showLabelCheck != null) showLabelCheck.IsChecked = shortcut.ShowLabel;
         };
 
         if (dialog.ShowDialog() == true)
         {
             shortcut.Name = dialog.ShortcutName;
             shortcut.Path = dialog.ShortcutPath;
+            shortcut.ShowLabel = dialog.ShowLabel;
             SaveShortcuts();
             // Force UI refresh
             var index = Shortcuts.IndexOf(shortcut);
@@ -175,7 +179,8 @@ public partial class MainViewModel : ViewModelBase
                 Command = dialog.CommandText,
                 RunHidden = dialog.RunHidden,
                 RequiresElevation = dialog.RequiresElevation,
-                IsFavorite = dialog.IsFavorite
+                IsFavorite = dialog.IsFavorite,
+                ShowLabel = dialog.ShowLabel
             };
 
             Commands.Add(command);
@@ -198,12 +203,14 @@ public partial class MainViewModel : ViewModelBase
             var runHiddenCheck = dialog.FindName("RunHiddenCheckBox") as System.Windows.Controls.CheckBox;
             var elevationCheck = dialog.FindName("RequiresElevationCheckBox") as System.Windows.Controls.CheckBox;
             var favoriteCheck = dialog.FindName("IsFavoriteCheckBox") as System.Windows.Controls.CheckBox;
+            var showLabelCheck = dialog.FindName("ShowLabelCheckBox") as System.Windows.Controls.CheckBox;
 
             if (nameBox != null) nameBox.Text = command.Name;
             if (commandBox != null) commandBox.Text = command.Command;
             if (runHiddenCheck != null) runHiddenCheck.IsChecked = command.RunHidden;
             if (elevationCheck != null) elevationCheck.IsChecked = command.RequiresElevation;
             if (favoriteCheck != null) favoriteCheck.IsChecked = command.IsFavorite;
+            if (showLabelCheck != null) showLabelCheck.IsChecked = command.ShowLabel;
         };
 
         if (dialog.ShowDialog() == true)
@@ -213,6 +220,7 @@ public partial class MainViewModel : ViewModelBase
             command.RunHidden = dialog.RunHidden;
             command.RequiresElevation = dialog.RequiresElevation;
             command.IsFavorite = dialog.IsFavorite;
+            command.ShowLabel = dialog.ShowLabel;
 
             _commandExecutor.SaveCommands(Commands);
             // Force UI refresh

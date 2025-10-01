@@ -7,4 +7,5 @@ public class PowerShellCommand
     public bool RunHidden { get; set; } = true;
     public bool RequiresElevation { get; set; } = false;
     public bool IsFavorite { get; set; } = false;
+    public bool ShowLabel { get; set; } = true;
 }

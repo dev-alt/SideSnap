@@ -9,14 +9,14 @@ namespace SideSnap.Services;
 public class CommandExecutorService : ICommandExecutorService
 {
     private readonly string _commandsPath;
-    private readonly string[] _dangerousPatterns = new[]
-    {
+    private readonly string[] _dangerousPatterns =
+    [
         @"rm\s+-rf",
         @"Remove-Item.*-Recurse",
         @"Format-Volume",
         @"del\s+/[sS]",
         @"cipher\s+/w"
-    };
+    ];
 
     public CommandExecutorService()
     {
@@ -86,23 +86,26 @@ public class CommandExecutorService : ICommandExecutorService
 
     private bool ValidateCommand(string command)
     {
-        foreach (var pattern in _dangerousPatterns)
-        {
-            if (Regex.IsMatch(command, pattern, RegexOptions.IgnoreCase))
-            {
-                return false;
-            }
-        }
-        return true;
+        return _dangerousPatterns.All(pattern => !Regex.IsMatch(command, pattern, RegexOptions.IgnoreCase));
     }
 
     private List<PowerShellCommand> GetDefaultCommands()
     {
-        return new List<PowerShellCommand>
-        {
-            new() { Name = "Open WSL", Command = "wsl", RunHidden = false },
-            new() { Name = "System Info", Command = "systeminfo", RunHidden = false },
-            new() { Name = "Network Status", Command = "Get-NetAdapter | Select-Object Name, Status, LinkSpeed", RunHidden = false }
-        };
+        return
+        [
+            new PowerShellCommand { Name = "Open WSL", Command = "wsl", RunHidden = false },
+            new PowerShellCommand
+            {
+                Name = "System Info", Command = "system info; Read-Host -Prompt 'Press Enter to continue'",
+                RunHidden = false
+            },
+            new PowerShellCommand
+            {
+                Name = "Network Status",
+                Command =
+                    "Get-NetAdapter | Select-Object Name, Status, LinkSpeed; Read-Host -Prompt 'Press Enter to continue'",
+                RunHidden = false
+            }
+        ];
     }
 }

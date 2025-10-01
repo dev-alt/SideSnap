@@ -7,6 +7,7 @@ public partial class AddShortcutDialog
 {
     public string ShortcutName { get; private set; } = string.Empty;
     public string ShortcutPath { get; private set; } = string.Empty;
+    public bool ShowLabel { get; private set; } = true;
 
     // New: texts to customize dialog header and primary button
     public string HeaderText { get; set; } = "Add New Shortcut";
@@ -63,6 +64,7 @@ public partial class AddShortcutDialog
 
         ShortcutName = NameTextBox.Text;
         ShortcutPath = PathTextBox.Text;
+        ShowLabel = ShowLabelCheckBox.IsChecked == true;
         DialogResult = true;
         Close();
     }

@@ -9,6 +9,7 @@ public partial class AddCommandDialog
     public bool RunHidden { get; private set; } = true;
     public bool RequiresElevation { get; private set; }
     public bool IsFavorite { get; private set; }
+    public bool ShowLabel { get; private set; } = true;
 
     public AddCommandDialog()
     {
@@ -34,6 +35,7 @@ public partial class AddCommandDialog
         RunHidden = RunHiddenCheckBox.IsChecked == true;
         RequiresElevation = RequiresElevationCheckBox.IsChecked == true;
         IsFavorite = IsFavoriteCheckBox.IsChecked == true;
+        ShowLabel = ShowLabelCheckBox.IsChecked == true;
 
         DialogResult = true;
         Close();
