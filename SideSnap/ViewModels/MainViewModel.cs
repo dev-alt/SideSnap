@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,7 +62,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task OpenShortcut(FolderShortcut? shortcut)
+    private async Task OpenShortcut(FolderShortcut shortcut)
     {
         if (shortcut != null)
         {
@@ -70,7 +71,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task ExecuteCommand(PowerShellCommand? command)
+    private async Task ExecuteCommand(PowerShellCommand command)
     {
         if (command != null)
         {
@@ -98,7 +99,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void RemoveShortcut(FolderShortcut? shortcut)
+    private void RemoveShortcut(FolderShortcut shortcut)
     {
         if (shortcut != null)
         {
@@ -109,14 +110,14 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void EditShortcut(FolderShortcut? shortcut)
+    private void EditShortcut(FolderShortcut shortcut)
     {
         if (shortcut == null) return;
 
         var dialog = _serviceProvider.GetRequiredService<AddShortcutDialog>();
         // Pre-populate with existing values
         dialog.Title = "Edit Shortcut";
-        dialog.Loaded += (_, _) =>
+        dialog.Loaded += (s, e) =>
         {
             var nameBox = dialog.FindName("NameTextBox") as System.Windows.Controls.TextBox;
             var pathBox = dialog.FindName("PathTextBox") as System.Windows.Controls.TextBox;
@@ -138,7 +139,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void MoveShortcutUp(FolderShortcut? shortcut)
+    private void MoveShortcutUp(FolderShortcut shortcut)
     {
         if (shortcut == null) return;
         var index = Shortcuts.IndexOf(shortcut);
@@ -152,7 +153,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void MoveShortcutDown(FolderShortcut? shortcut)
+    private void MoveShortcutDown(FolderShortcut shortcut)
     {
         if (shortcut == null) return;
         var index = Shortcuts.IndexOf(shortcut);
@@ -166,7 +167,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void RemoveCommand(PowerShellCommand? command)
+    private void RemoveCommand(PowerShellCommand command)
     {
         if (command != null)
         {
@@ -198,13 +199,13 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void EditCommand(PowerShellCommand? command)
+    private void EditCommand(PowerShellCommand command)
     {
         if (command == null) return;
 
         var dialog = _serviceProvider.GetRequiredService<AddCommandDialog>();
         dialog.Title = "Edit PowerShell Command";
-        dialog.Loaded += (_, _) =>
+        dialog.Loaded += (s, e) =>
         {
             var nameBox = dialog.FindName("NameTextBox") as System.Windows.Controls.TextBox;
             var commandBox = dialog.FindName("CommandTextBox") as System.Windows.Controls.TextBox;
@@ -237,7 +238,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void MoveCommandUp(PowerShellCommand? command)
+    private void MoveCommandUp(PowerShellCommand command)
     {
         if (command == null) return;
         var index = Commands.IndexOf(command);
@@ -250,7 +251,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void MoveCommandDown(PowerShellCommand? command)
+    private void MoveCommandDown(PowerShellCommand command)
     {
         if (command == null) return;
         var index = Commands.IndexOf(command);
@@ -282,7 +283,7 @@ public partial class MainViewModel : ViewModelBase
         Shortcuts = new ObservableCollection<FolderShortcut>(shortcuts);
 
         // Listen to collection changes to auto-save when reordering
-        Shortcuts.CollectionChanged += (_, e) =>
+        Shortcuts.CollectionChanged += (s, e) =>
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
             {
@@ -299,7 +300,7 @@ public partial class MainViewModel : ViewModelBase
         Commands = new ObservableCollection<PowerShellCommand>(commands);
 
         // Listen to collection changes to auto-save when reordering
-        Commands.CollectionChanged += (_, e) =>
+        Commands.CollectionChanged += (s, e) =>
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Move)
             {

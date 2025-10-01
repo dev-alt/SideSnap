@@ -8,8 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace SideSnap.Services;
 
-public class IconService(ILogger<IconService> logger) : IIconService
+public class IconService : IIconService
 {
+    private readonly ILogger<IconService> _logger;
     private readonly Dictionary<string, ImageSource> _iconCache = new();
 
     // Win32 API
@@ -38,7 +39,12 @@ public class IconService(ILogger<IconService> logger) : IIconService
     private const uint FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
     private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080;
 
-    public ImageSource GetIcon(string path)
+    public IconService(ILogger<IconService> logger)
+    {
+        _logger = logger;
+    }
+
+    public ImageSource? GetIcon(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             return GetFileIcon();
@@ -63,7 +69,7 @@ public class IconService(ILogger<IconService> logger) : IIconService
                     // For shortcuts, try to resolve the target
                     icon = ExtractIcon(path, false);
                 }
-                else if (extension is ".exe" or ".ico")
+                else if (extension == ".exe" || extension == ".ico")
                 {
                     icon = ExtractIcon(path, false);
                 }
@@ -80,12 +86,12 @@ public class IconService(ILogger<IconService> logger) : IIconService
                 return icon;
             }
 
-            logger.LogDebug("Could not extract icon for: {Path}", path);
+            _logger.LogDebug("Could not extract icon for: {Path}", path);
             return Directory.Exists(path) ? GetFolderIcon() : GetFileIcon();
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Failed to get icon for: {Path}", path);
+            _logger.LogWarning(ex, "Failed to get icon for: {Path}", path);
             return GetFileIcon();
         }
     }
@@ -209,7 +215,7 @@ public class IconService(ILogger<IconService> logger) : IIconService
         };
 
         visual.Measure(new System.Windows.Size(16, 16));
-        visual.Arrange(new Rect(0, 0, 16, 16));
+        visual.Arrange(new System.Windows.Rect(0, 0, 16, 16));
         bitmap.Render(visual);
         bitmap.Freeze();
 
@@ -219,6 +225,6 @@ public class IconService(ILogger<IconService> logger) : IIconService
     public void ClearCache()
     {
         _iconCache.Clear();
-        logger.LogInformation("Icon cache cleared");
+        _logger.LogInformation("Icon cache cleared");
     }
 }

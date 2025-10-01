@@ -144,7 +144,8 @@ public partial class MainWindow : Window
             var files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
             if (files != null && files.Length > 0)
             {
-                if (DataContext is MainViewModel viewModel)
+                var viewModel = DataContext as MainViewModel;
+                if (viewModel != null)
                 {
                     foreach (var file in files)
                     {

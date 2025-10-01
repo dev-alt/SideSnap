@@ -132,7 +132,7 @@ public class WindowManagerService : IWindowManagerService
     {
         IntPtr foundWindow = IntPtr.Zero;
 
-        EnumWindows((hWnd, _) =>
+        EnumWindows((hWnd, lParam) =>
         {
             if (IsWindowVisible(hWnd))
             {
@@ -201,13 +201,12 @@ public class WindowManagerService : IWindowManagerService
     {
         var monitors = new List<(IntPtr, RECT)>();
 
-        bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData)
+        EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (hMonitor, hdcMonitor, ref RECT lprcMonitor, dwData) =>
         {
             monitors.Add((hMonitor, lprcMonitor));
             return true;
-        }
+        }, IntPtr.Zero);
 
-        EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, MonitorEnumProc, IntPtr.Zero);
         return monitors;
     }
 

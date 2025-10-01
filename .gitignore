@@ -3,28 +3,12 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
-# Build results
-bin/
-obj/
-out/
-
-# Rider project files
-.idea/
-*.sln.iml
-qodana.yaml
-
 # User-specific files
 *.rsuser
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
-
-# Logs
-Build-*.txt
-
-# VS Code settings (if used)
-.vscode/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -145,21 +129,19 @@ _ReSharper*/
 !**/[Pp]ackages/build/
 *.nuget.props
 *.nuget.targets
-packages/
-*.nuspec
 
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
-
-# OS generated files
-.DS_Store
 
 # Folder config file
 Desktop.ini
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
+
+# VS Code directories
+.vscode/
 
 # Windows Installer files
 *.cab
@@ -170,6 +152,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-# Publish output
-publish/
