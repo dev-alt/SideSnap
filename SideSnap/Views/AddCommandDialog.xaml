@@ -64,9 +64,37 @@
                      Margin="0,5"/>
         </StackPanel>
 
+        <!-- Custom Icon -->
+        <StackPanel Grid.Row="4" Margin="0,0,0,10">
+            <TextBlock Text="Custom Icon (optional):"
+                      FontWeight="Bold"
+                      Margin="0,0,0,5"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="IconPathTextBox"
+                        Grid.Column="0"
+                        Padding="8"
+                        FontSize="12"
+                        Margin="0,0,10,0"
+                        IsReadOnly="True"/>
+                <Button Grid.Column="1"
+                       Content="Browse..."
+                       Click="BrowseIconButton_Click"
+                       Width="80"
+                       Height="32"
+                       Background="#9B59B6"
+                       Foreground="White"
+                       BorderThickness="0"
+                       Cursor="Hand"/>
+            </Grid>
+        </StackPanel>
+
         <!-- Show label -->
         <CheckBox x:Name="ShowLabelCheckBox"
-                  Grid.Row="4"
+                  Grid.Row="5"
                   Content="Show label on tile"
                   IsChecked="True"
                   Margin="0,0,0,10"/>

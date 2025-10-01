@@ -9,6 +9,7 @@ public class PowerShellCommand
     public bool IsFavorite { get; set; } = false;
     public bool ShowLabel { get; set; } = true;
     public ScriptType ScriptType { get; set; } = ScriptType.PowerShell;
+    public string CustomIconPath { get; set; } = string.Empty;
 }
 
 public enum ScriptType

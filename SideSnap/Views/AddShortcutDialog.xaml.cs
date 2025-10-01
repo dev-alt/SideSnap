@@ -7,6 +7,7 @@ public partial class AddShortcutDialog
 {
     public string ShortcutName { get; private set; } = string.Empty;
     public string ShortcutPath { get; private set; } = string.Empty;
+    public string CustomIconPath { get; private set; } = string.Empty;
     public bool ShowLabel { get; private set; } = true;
 
     // New: texts to customize dialog header and primary button
@@ -42,6 +43,21 @@ public partial class AddShortcutDialog
         }
     }
 
+    private void BrowseIconButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Select Icon File",
+            Filter = "Icon Files (*.ico;*.png;*.jpg;*.bmp)|*.ico;*.png;*.jpg;*.jpeg;*.bmp|All Files (*.*)|*.*",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            IconPathTextBox.Text = dialog.FileName;
+        }
+    }
+
     private void AddButton_Click(object sender, RoutedEventArgs e)
     {
         if (string.IsNullOrWhiteSpace(NameTextBox.Text))
@@ -64,6 +80,7 @@ public partial class AddShortcutDialog
 
         ShortcutName = NameTextBox.Text;
         ShortcutPath = PathTextBox.Text;
+        CustomIconPath = IconPathTextBox.Text ?? string.Empty;
         ShowLabel = ShowLabelCheckBox.IsChecked == true;
         DialogResult = true;
         Close();

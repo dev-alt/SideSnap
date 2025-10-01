@@ -129,11 +129,17 @@
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <Image Source="{Binding Path, Converter={StaticResource PathToIconConverter}}"
-                                              Width="32"
+                                        <Image Width="32"
                                               Height="32"
                                               Margin="0,0,0,5"
-                                              RenderOptions.BitmapScalingMode="HighQuality"/>
+                                              RenderOptions.BitmapScalingMode="HighQuality">
+                                            <Image.Source>
+                                                <MultiBinding Converter="{StaticResource CustomIconConverter}">
+                                                    <Binding Path="IconPath"/>
+                                                    <Binding Path="Path"/>
+                                                </MultiBinding>
+                                            </Image.Source>
+                                        </Image>
                                         <TextBlock Text="{Binding Name}"
                                                   Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
                                                   TextWrapping="Wrap"
@@ -193,10 +199,16 @@
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock Text="{Binding ScriptType, Converter={StaticResource ScriptTypeToIconConverter}}"
-                                                  FontSize="28"
+                                        <TextBlock FontSize="28"
                                                   TextAlignment="Center"
-                                                  Margin="0,0,0,5"/>
+                                                  Margin="0,0,0,5">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource CommandIconConverter}">
+                                                    <Binding Path="CustomIconPath"/>
+                                                    <Binding Path="ScriptType"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
                                         <TextBlock Text="{Binding Name}"
                                                   Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
                                                   TextWrapping="Wrap"

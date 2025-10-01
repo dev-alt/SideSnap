@@ -28,9 +28,12 @@ public partial class App
         var logger = _serviceProvider.GetRequiredService<ILogger<App>>();
         logger.LogInformation("SideSnap application starting...");
 
-        // Initialize icon converter
-        PathToIconConverter.Initialize(_serviceProvider.GetRequiredService<IIconService>());
-        logger.LogInformation("Icon converter initialized");
+        // Initialize icon converters
+        var iconService = _serviceProvider.GetRequiredService<IIconService>();
+        PathToIconConverter.Initialize(iconService);
+        CustomIconConverter.Initialize(iconService);
+        CommandIconConverter.Initialize(iconService);
+        logger.LogInformation("Icon converters initialized");
 
         // Initialize tray service
         var trayService = _serviceProvider.GetRequiredService<ITrayService>();

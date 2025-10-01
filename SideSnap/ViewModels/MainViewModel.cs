@@ -79,6 +79,7 @@ public partial class MainViewModel : ViewModelBase
             {
                 Name = dialog.ShortcutName,
                 Path = dialog.ShortcutPath,
+                IconPath = dialog.CustomIconPath,
                 Order = Shortcuts.Count,
                 ShowLabel = dialog.ShowLabel
             };
@@ -111,9 +112,11 @@ public partial class MainViewModel : ViewModelBase
         {
             var nameBox = dialog.FindName("NameTextBox") as System.Windows.Controls.TextBox;
             var pathBox = dialog.FindName("PathTextBox") as System.Windows.Controls.TextBox;
+            var iconPathBox = dialog.FindName("IconPathTextBox") as System.Windows.Controls.TextBox;
             var showLabelCheck = dialog.FindName("ShowLabelCheckBox") as System.Windows.Controls.CheckBox;
             if (nameBox != null) nameBox.Text = shortcut.Name;
             if (pathBox != null) pathBox.Text = shortcut.Path;
+            if (iconPathBox != null) iconPathBox.Text = shortcut.IconPath;
             if (showLabelCheck != null) showLabelCheck.IsChecked = shortcut.ShowLabel;
         };
 
@@ -121,6 +124,7 @@ public partial class MainViewModel : ViewModelBase
         {
             shortcut.Name = dialog.ShortcutName;
             shortcut.Path = dialog.ShortcutPath;
+            shortcut.IconPath = dialog.CustomIconPath;
             shortcut.ShowLabel = dialog.ShowLabel;
             SaveShortcuts();
             // Force UI refresh
@@ -177,6 +181,7 @@ public partial class MainViewModel : ViewModelBase
             {
                 Name = dialog.CommandName,
                 Command = dialog.CommandText,
+                CustomIconPath = dialog.CustomIconPath,
                 RunHidden = dialog.RunHidden,
                 RequiresElevation = dialog.RequiresElevation,
                 IsFavorite = dialog.IsFavorite,
@@ -201,6 +206,7 @@ public partial class MainViewModel : ViewModelBase
         {
             var nameBox = dialog.FindName("NameTextBox") as System.Windows.Controls.TextBox;
             var commandBox = dialog.FindName("CommandTextBox") as System.Windows.Controls.TextBox;
+            var iconPathBox = dialog.FindName("IconPathTextBox") as System.Windows.Controls.TextBox;
             var runHiddenCheck = dialog.FindName("RunHiddenCheckBox") as System.Windows.Controls.CheckBox;
             var elevationCheck = dialog.FindName("RequiresElevationCheckBox") as System.Windows.Controls.CheckBox;
             var favoriteCheck = dialog.FindName("IsFavoriteCheckBox") as System.Windows.Controls.CheckBox;
@@ -208,6 +214,7 @@ public partial class MainViewModel : ViewModelBase
 
             if (nameBox != null) nameBox.Text = command.Name;
             if (commandBox != null) commandBox.Text = command.Command;
+            if (iconPathBox != null) iconPathBox.Text = command.CustomIconPath;
             if (runHiddenCheck != null) runHiddenCheck.IsChecked = command.RunHidden;
             if (elevationCheck != null) elevationCheck.IsChecked = command.RequiresElevation;
             if (favoriteCheck != null) favoriteCheck.IsChecked = command.IsFavorite;
@@ -218,6 +225,7 @@ public partial class MainViewModel : ViewModelBase
         {
             command.Name = dialog.CommandName;
             command.Command = dialog.CommandText;
+            command.CustomIconPath = dialog.CustomIconPath;
             command.RunHidden = dialog.RunHidden;
             command.RequiresElevation = dialog.RequiresElevation;
             command.IsFavorite = dialog.IsFavorite;
