@@ -7,6 +7,21 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Setup logging
+$logDir = Join-Path $PSScriptRoot "logs"
+if (-not (Test-Path $logDir)) {
+    New-Item -ItemType Directory -Path $logDir | Out-Null
+}
+$timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+$logFile = Join-Path $logDir "build_$timestamp.log"
+
+function Write-Log {
+    param([string]$Message, [string]$Color = "White")
+    $logMessage = "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') - $Message"
+    Add-Content -Path $logFile -Value $logMessage
+    Write-Host $Message -ForegroundColor $Color
+}
+
 function Wait-ForKeyPress {
     Write-Host ""
     Write-Host "Press any key to exit..." -ForegroundColor Yellow
@@ -14,60 +29,69 @@ function Wait-ForKeyPress {
 }
 
 try {
-    Write-Host "=====================================" -ForegroundColor Cyan
-    Write-Host "       SideSnap Build Script        " -ForegroundColor Cyan
-    Write-Host "=====================================" -ForegroundColor Cyan
-    Write-Host ""
+    Write-Log "=====================================" -Color Cyan
+    Write-Log "       SideSnap Build Script        " -Color Cyan
+    Write-Log "=====================================" -Color Cyan
+    Write-Log "Log file: $logFile" -Color Gray
+    Write-Log ""
 
     # Navigate to script directory
     $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
     Set-Location $scriptPath
 
     # Clean
-    Write-Host "Cleaning solution..." -ForegroundColor Yellow
-    dotnet clean SideSnap.sln --configuration Release 2>&1 | Out-String | Write-Host
+    Write-Log "Cleaning solution..." -Color Yellow
+    $cleanOutput = dotnet clean SideSnap.sln --configuration Release 2>&1 | Out-String
+    Add-Content -Path $logFile -Value $cleanOutput
+    Write-Host $cleanOutput
     if ($LASTEXITCODE -ne 0) {
         throw "Clean failed with exit code $LASTEXITCODE"
     }
-    Write-Host "Clean completed successfully!" -ForegroundColor Green
-    Write-Host ""
+    Write-Log "Clean completed successfully!" -Color Green
+    Write-Log ""
 
     # Restore
-    Write-Host "Restoring packages..." -ForegroundColor Yellow
-    dotnet restore SideSnap.sln 2>&1 | Out-String | Write-Host
+    Write-Log "Restoring packages..." -Color Yellow
+    $restoreOutput = dotnet restore SideSnap.sln 2>&1 | Out-String
+    Add-Content -Path $logFile -Value $restoreOutput
+    Write-Host $restoreOutput
     if ($LASTEXITCODE -ne 0) {
         throw "Restore failed with exit code $LASTEXITCODE"
     }
-    Write-Host "Restore completed successfully!" -ForegroundColor Green
-    Write-Host ""
+    Write-Log "Restore completed successfully!" -Color Green
+    Write-Log ""
 
     # Build
-    Write-Host "Building solution..." -ForegroundColor Yellow
-    dotnet build SideSnap.sln --configuration Release --no-restore 2>&1 | Out-String | Write-Host
+    Write-Log "Building solution..." -Color Yellow
+    $buildOutput = dotnet build SideSnap.sln --configuration Release --no-restore 2>&1 | Out-String
+    Add-Content -Path $logFile -Value $buildOutput
+    Write-Host $buildOutput
     if ($LASTEXITCODE -ne 0) {
         throw "Build failed with exit code $LASTEXITCODE"
     }
-    Write-Host "Build completed successfully!" -ForegroundColor Green
-    Write-Host ""
+    Write-Log "Build completed successfully!" -Color Green
+    Write-Log ""
 
     # Run
     if (-not $SkipRun) {
-        Write-Host "Running SideSnap..." -ForegroundColor Cyan
-        Write-Host ""
-        dotnet run --project SideSnap\SideSnap.csproj --configuration Release --no-build 2>&1 | Out-String | Write-Host
+        Write-Log "Running SideSnap..." -Color Cyan
+        Write-Log ""
+        $runOutput = dotnet run --project SideSnap\SideSnap.csproj --configuration Release --no-build 2>&1 | Out-String
+        Add-Content -Path $logFile -Value $runOutput
+        Write-Host $runOutput
         if ($LASTEXITCODE -ne 0) {
             throw "Application exited with exit code $LASTEXITCODE"
         }
     } else {
-        Write-Host "Skipping run. Use './build.ps1' without -SkipRun to launch the app." -ForegroundColor Yellow
+        Write-Log "Skipping run. Use './build.ps1' without -SkipRun to launch the app." -Color Yellow
         Wait-ForKeyPress
     }
 }
 catch {
-    Write-Host ""
-    Write-Host "=====================================" -ForegroundColor Red
-    Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "=====================================" -ForegroundColor Red
+    Write-Log "" -Color Red
+    Write-Log "=====================================" -Color Red
+    Write-Log "ERROR: $($_.Exception.Message)" -Color Red
+    Write-Log "=====================================" -Color Red
     Wait-ForKeyPress
     exit 1
 }
