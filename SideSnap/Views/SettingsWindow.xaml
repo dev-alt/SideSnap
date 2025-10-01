@@ -4,8 +4,10 @@
         Title="SideSnap Settings"
         Width="400"
         Height="350"
+        MinWidth="350"
+        MinHeight="300"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
         Background="#F0F0F0">
 
     <Grid Margin="15">
