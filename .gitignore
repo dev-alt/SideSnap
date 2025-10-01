@@ -6,7 +6,7 @@ out/
 # Rider project files
 .idea/
 *.sln.iml
-
+qodana.yaml
 # User-specific files
 *.user
 *.suo
