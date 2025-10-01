@@ -2,13 +2,13 @@ using System.Windows;
 
 namespace SideSnap.Views;
 
-public partial class AddCommandDialog : Window
+public partial class AddCommandDialog
 {
     public string CommandName { get; private set; } = string.Empty;
     public string CommandText { get; private set; } = string.Empty;
     public bool RunHidden { get; private set; } = true;
-    public bool RequiresElevation { get; private set; } = false;
-    public bool IsFavorite { get; private set; } = false;
+    public bool RequiresElevation { get; private set; }
+    public bool IsFavorite { get; private set; }
 
     public AddCommandDialog()
     {

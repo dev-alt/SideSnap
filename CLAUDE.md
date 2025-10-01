@@ -69,3 +69,26 @@ The application is organized into the following core modules:
 - Support Windows 10/11 design guidelines for modern appearance
 - Register for startup with Windows via registry or startup folder
 - After pushing to github run ./sync.sh
+
+## Code Quality Standards
+
+### Naming Conventions
+- **Win32 Constants**: Use PascalCase for private constants (e.g., `WmWindowPosChanging`, not `WM_WINDOWPOSCHANGING`)
+- **Win32 Structs**: Use PascalCase for struct names (e.g., `WindowPos`, not `WINDOWPOS`)
+- **C# Conventions**: Follow C# naming guidelines, not Win32 conventions for private members
+
+### Code Style
+- **Unused Parameters**: Use discard `_` for unused event handler parameters (e.g., `(_, e) =>` not `(s, e) =>`)
+- **Redundant Qualifiers**: Remove redundant namespace qualifiers when using directives are present
+- **Unused Using Directives**: Remove all unused using statements
+- **Partial Classes**: Do not repeat base type in code-behind files (XAML already declares it)
+- **Redundant Initializers**: Remove properties initialized to their default values (e.g., `= false;` for bool)
+- **Nullability**: Ensure nullability annotations match interface contracts and actual usage
+- **Using Statements**: Initialize disposable objects inside `using` statement to ensure disposal on exception
+
+### Modern C# Features
+- Use collection expressions `[]` instead of `new List<T>()`
+- Use pattern matching (`is null`, `is not null`)
+- Use discard assignments `_` for intentionally ignored return values
+- Use `LibraryImport` with partial methods for P/Invoke (requires partial class)
+- Use early return guard clauses for better readability
