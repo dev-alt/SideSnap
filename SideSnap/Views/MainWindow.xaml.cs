@@ -255,4 +255,44 @@ public partial class MainWindow
 
         BeginAnimation(WidthProperty, animation);
     }
+
+    private void ProjectButton_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        if (sender is System.Windows.Controls.Button button && button.DataContext is Models.Project project)
+        {
+            // Find the popup in the visual tree
+            var grid = button.Parent as System.Windows.Controls.Grid;
+            if (grid != null)
+            {
+                var popup = grid.FindName("ProjectDropdown") as System.Windows.Controls.Primitives.Popup;
+                if (popup != null)
+                {
+                    popup.IsOpen = true;
+                }
+            }
+        }
+    }
+
+    private void ProjectButton_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        // Delay closing to allow mouse to move to popup
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+        timer.Tick += (s, args) =>
+        {
+            timer.Stop();
+            if (sender is System.Windows.Controls.Button button)
+            {
+                var grid = button.Parent as System.Windows.Controls.Grid;
+                if (grid != null)
+                {
+                    var popup = grid.FindName("ProjectDropdown") as System.Windows.Controls.Primitives.Popup;
+                    if (popup != null && !popup.IsMouseOver)
+                    {
+                        popup.IsOpen = false;
+                    }
+                }
+            }
+        };
+        timer.Start();
+    }
 }

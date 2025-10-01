@@ -157,6 +157,99 @@
                            Margin="5,5,5,10"
                            Style="{StaticResource AddButton}"/>
 
+                    <!-- Projects Section -->
+                    <TextBlock Text="Projects"
+                              FontWeight="Bold"
+                              FontSize="10"
+                              Foreground="#7F8C8D"
+                              Margin="5,10,5,5"/>
+
+                    <ItemsControl ItemsSource="{Binding Projects}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid d:DataContext="{d:DesignInstance Type=models:Project, IsDesignTimeCreatable=True}">
+                                    <Button Command="{Binding DataContext.ShowProjectDropdownCommand, Source={x:Reference RootWindow}}"
+                                           CommandParameter="{Binding}"
+                                           Margin="5,3"
+                                           HorizontalAlignment="Stretch"
+                                           Style="{StaticResource SidebarButton}"
+                                           MouseEnter="ProjectButton_MouseEnter"
+                                           MouseLeave="ProjectButton_MouseLeave">
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Delete"
+                                                         Command="{Binding DataContext.RemoveProjectCommand, Source={x:Reference RootWindow}}"
+                                                         CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                            <Image Width="32"
+                                                  Height="32"
+                                                  Margin="0,0,0,5"
+                                                  RenderOptions.BitmapScalingMode="HighQuality">
+                                                <Image.Source>
+                                                    <MultiBinding Converter="{StaticResource CustomIconConverter}">
+                                                        <Binding Path="IconPath"/>
+                                                        <Binding Path="Name"/>
+                                                    </MultiBinding>
+                                                </Image.Source>
+                                            </Image>
+                                            <TextBlock Text="{Binding Name}"
+                                                      Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
+                                                      TextWrapping="Wrap"
+                                                      TextAlignment="Center"
+                                                      FontSize="9"
+                                                      MaxWidth="75"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <!-- Dropdown Panel -->
+                                    <Popup x:Name="ProjectDropdown"
+                                           PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=Button}}"
+                                           Placement="Right"
+                                           IsOpen="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                           StaysOpen="False"
+                                           AllowsTransparency="True">
+                                        <Border Background="White"
+                                               BorderBrush="#CCCCCC"
+                                               BorderThickness="1"
+                                               CornerRadius="5"
+                                               Padding="5"
+                                               Margin="5,0,0,0">
+                                            <Border.Effect>
+                                                <DropShadowEffect ShadowDepth="2" BlurRadius="10" Opacity="0.3"/>
+                                            </Border.Effect>
+                                            <StackPanel MinWidth="150">
+                                                <ItemsControl ItemsSource="{Binding Items}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Button Command="{Binding DataContext.ExecuteProjectItemCommand, Source={x:Reference RootWindow}}"
+                                                                   CommandParameter="{Binding}"
+                                                                   Style="{StaticResource SidebarButton}"
+                                                                   Margin="2"
+                                                                   HorizontalAlignment="Stretch">
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock Text="{Binding Name}"
+                                                                              FontSize="11"
+                                                                              VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </Button>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </Border>
+                                    </Popup>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Button Content="+"
+                           Command="{Binding AddProjectCommand}"
+                           Margin="5,5,5,10"
+                           Style="{StaticResource AddButton}"/>
+
                     <!-- Commands Section -->
                     <TextBlock Text="Commands"
                               FontWeight="Bold"

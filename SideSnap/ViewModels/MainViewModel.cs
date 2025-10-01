@@ -15,6 +15,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly ISettingsService _settingsService;
     private readonly ICommandExecutorService _commandExecutor;
     private readonly IShortcutService _shortcutService;
+    private readonly IProjectService _projectService;
     private readonly ILogger<MainViewModel> _logger;
     private readonly IServiceProvider _serviceProvider;
 
@@ -25,27 +26,36 @@ public partial class MainViewModel : ViewModelBase
     private double _sidebarWidth = 250;
 
     [ObservableProperty]
-    private ObservableCollection<FolderShortcut> _shortcuts = new();
+    private ObservableCollection<FolderShortcut> _shortcuts = [];
 
     [ObservableProperty]
-    private ObservableCollection<PowerShellCommand> _commands = new();
+    private ObservableCollection<PowerShellCommand> _commands = [];
+
+    [ObservableProperty]
+    private ObservableCollection<Project> _projects = [];
+
+    [ObservableProperty]
+    private Project? _hoveredProject;
 
     public MainViewModel(
         ISettingsService settingsService,
         ICommandExecutorService commandExecutor,
         IShortcutService shortcutService,
+        IProjectService projectService,
         ILogger<MainViewModel> logger,
         IServiceProvider serviceProvider)
     {
         _settingsService = settingsService;
         _commandExecutor = commandExecutor;
         _shortcutService = shortcutService;
+        _projectService = projectService;
         _logger = logger;
         _serviceProvider = serviceProvider;
 
         LoadSettings();
         LoadShortcuts();
         LoadCommands();
+        LoadProjects();
     }
 
     [RelayCommand]
@@ -439,5 +449,83 @@ public partial class MainViewModel : ViewModelBase
         }
 
         return windowsPath.Replace('\\', '/');
+    }
+
+    // Project Management
+    private void LoadProjects()
+    {
+        var projects = _projectService.GetProjects();
+        Projects = new ObservableCollection<Project>(projects);
+    }
+
+    private void SaveProjects()
+    {
+        _projectService.SaveProjects(Projects);
+    }
+
+    [RelayCommand]
+    private void AddProject()
+    {
+        // TODO: Create AddProjectDialog
+        var project = new Project
+        {
+            Name = "New Project",
+            Order = Projects.Count
+        };
+        Projects.Add(project);
+        SaveProjects();
+        _logger.LogInformation("Added project: {Name}", project.Name);
+    }
+
+    [RelayCommand]
+    private void RemoveProject(Project? project)
+    {
+        if (project == null) return;
+        Projects.Remove(project);
+        SaveProjects();
+        _logger.LogInformation("Removed project: {Name}", project.Name);
+    }
+
+    [RelayCommand]
+    private void ExecuteProjectItem(ProjectItem? item)
+    {
+        if (item == null) return;
+
+        switch (item.Type)
+        {
+            case ProjectItemType.Folder:
+                _shortcutService.OpenFolderAsync(item.Path);
+                break;
+            case ProjectItemType.Script:
+                var cmd = new PowerShellCommand
+                {
+                    Name = item.Name,
+                    Command = item.Command,
+                    RunHidden = false
+                };
+                _commandExecutor.ExecuteAsync(cmd);
+                break;
+            case ProjectItemType.Command:
+                var command = new PowerShellCommand
+                {
+                    Name = item.Name,
+                    Command = item.Command,
+                    RunHidden = false
+                };
+                _commandExecutor.ExecuteAsync(command);
+                break;
+        }
+    }
+
+    [RelayCommand]
+    private void ShowProjectDropdown(Project? project)
+    {
+        HoveredProject = project;
+    }
+
+    [RelayCommand]
+    private void HideProjectDropdown()
+    {
+        HoveredProject = null;
     }
 }

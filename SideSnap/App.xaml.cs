@@ -68,6 +68,7 @@ public partial class App
         services.AddSingleton<ITrayService, TrayService>();
         services.AddSingleton<IIconService, IconService>();
         services.AddSingleton<ITodoService, TodoService>();
+        services.AddSingleton<IProjectService, ProjectService>();
 
         // ViewModels
         services.AddSingleton<MainViewModel>();
