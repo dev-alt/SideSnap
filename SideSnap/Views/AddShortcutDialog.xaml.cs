@@ -15,27 +15,25 @@ public partial class AddShortcutDialog : Window
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFileDialog
-        {
-            Title = "Select Folder or File",
-            Filter = "All Files (*.*)|*.*",
-            CheckFileExists = false,
-            CheckPathExists = true
-        };
-
-        // Try to use folder browser instead
-        using var folderDialog = new System.Windows.Forms.FolderBrowserDialog
+        using var dialog = new System.Windows.Forms.FolderBrowserDialog
         {
             Description = "Select a folder",
-            ShowNewFolderButton = true
+            ShowNewFolderButton = true,
+            SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
         };
 
-        if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+        if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.SelectedPath))
         {
-            PathTextBox.Text = folderDialog.SelectedPath;
+            PathTextBox.Text = dialog.SelectedPath;
             if (string.IsNullOrWhiteSpace(NameTextBox.Text))
             {
-                NameTextBox.Text = Path.GetFileName(folderDialog.SelectedPath);
+                var trimmed = dialog.SelectedPath.TrimEnd(Path.DirectorySeparatorChar);
+                var name = Path.GetFileName(trimmed);
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = trimmed;
+                }
+                NameTextBox.Text = name;
             }
         }
     }
