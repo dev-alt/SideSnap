@@ -94,7 +94,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void EditShortcut(FolderShortcut shortcut)
+    private void EditShortcut(FolderShortcut? shortcut)
     {
         if (shortcut == null) return;
 
@@ -123,7 +123,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void MoveShortcutUp(FolderShortcut shortcut)
+    private void MoveShortcutUp(FolderShortcut? shortcut)
     {
         if (shortcut == null) return;
         var index = Shortcuts.IndexOf(shortcut);
@@ -137,7 +137,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void MoveShortcutDown(FolderShortcut shortcut)
+    private void MoveShortcutDown(FolderShortcut? shortcut)
     {
         if (shortcut == null) return;
         var index = Shortcuts.IndexOf(shortcut);
@@ -180,7 +180,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void EditCommand(PowerShellCommand command)
+    private void EditCommand(PowerShellCommand? command)
     {
         if (command == null) return;
 
@@ -219,7 +219,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void MoveCommandUp(PowerShellCommand command)
+    private void MoveCommandUp(PowerShellCommand? command)
     {
         if (command == null) return;
         var index = Commands.IndexOf(command);
@@ -232,7 +232,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void MoveCommandDown(PowerShellCommand command)
+    private void MoveCommandDown(PowerShellCommand? command)
     {
         if (command == null) return;
         var index = Commands.IndexOf(command);

@@ -4,7 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:utils="clr-namespace:SideSnap.Utils"
+        xmlns:viewModels="clr-namespace:SideSnap.ViewModels"
+        xmlns:models="clr-namespace:SideSnap.Models"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=viewModels:MainViewModel, IsDesignTimeCreatable=False}"
         Title="SideSnap"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -19,7 +22,12 @@
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         AllowDrop="True"
         Drop="Window_Drop"
-        DragOver="Window_DragOver">
+        DragOver="Window_DragOver"
+        x:Name="RootWindow">
+
+    <Window.Resources>
+        <d:DesignInstance x:Key="DesignMainViewModel" Type="viewModels:MainViewModel" IsDesignTimeCreatable="False" />
+    </Window.Resources>
 
     <Border Background="#F0F0F0"
             BorderBrush="#CCCCCC"
@@ -90,10 +98,11 @@
                               Foreground="#7F8C8D"
                               Margin="5,5,5,5"/>
 
-                    <ItemsControl ItemsSource="{Binding Shortcuts}" utils:DragDropReorderBehavior.IsEnabled="True">
+                    <ItemsControl ItemsSource="{Binding Shortcuts}" d:ItemsSource="{d:DesignInstance Type=models:FolderShortcut, IsDesignTimeCreatable=True}" utils:DragDropReorderBehavior.IsEnabled="True">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Command="{Binding DataContext.OpenShortcutCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                <Button d:DataContext="{d:DesignInstance Type=models:FolderShortcut, IsDesignTimeCreatable=True}"
+                                        Command="{Binding DataContext.OpenShortcutCommand, RelativeSource={RelativeSource AncestorType=Window}, d:Source={StaticResource DesignMainViewModel}}"
                                        CommandParameter="{Binding}"
                                        Margin="5,3"
                                        HorizontalAlignment="Stretch"
@@ -144,10 +153,11 @@
                               Foreground="#7F8C8D"
                               Margin="5,10,5,5"/>
 
-                    <ItemsControl ItemsSource="{Binding Commands}" utils:DragDropReorderBehavior.IsEnabled="True">
+                    <ItemsControl ItemsSource="{Binding Commands}" d:ItemsSource="{d:DesignInstance Type=models:PowerShellCommand, IsDesignTimeCreatable=True}" utils:DragDropReorderBehavior.IsEnabled="True">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Command="{Binding DataContext.ExecuteCommandCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                <Button d:DataContext="{d:DesignInstance Type=models:PowerShellCommand, IsDesignTimeCreatable=True}"
+                                        Command="{Binding DataContext.ExecuteCommandCommand, RelativeSource={RelativeSource AncestorType=Window}, d:Source={StaticResource DesignMainViewModel}}"
                                        CommandParameter="{Binding}"
                                        Margin="5,3"
                                        HorizontalAlignment="Stretch"

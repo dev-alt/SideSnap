@@ -1,6 +1,9 @@
 using System.Globalization;
 using System.Windows.Data;
 using SideSnap.Services;
+using Binding = System.Windows.Data.Binding;
+
+// ReSharper disable NullnessAnnotationConflictWithJetBrainsAnnotations
 
 namespace SideSnap.Utils;
 
@@ -13,10 +16,10 @@ public class PathToIconConverter : IValueConverter
         _iconService = iconService;
     }
 
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (_iconService == null || value is not string path || string.IsNullOrWhiteSpace(path))
-            return null!;
+            return Binding.DoNothing;
 
         return _iconService.GetIcon(path);
     }

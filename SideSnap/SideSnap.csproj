@@ -9,6 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>SideSnap</AssemblyName>
     <RootNamespace>SideSnap</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>

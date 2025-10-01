@@ -124,24 +124,24 @@ public partial class MainWindow
         System.Windows.Application.Current.Shutdown();
     }
 
-    private void Window_DragOver(object sender, DragEventArgs e)
+    private void Window_DragOver(object sender, System.Windows.DragEventArgs e)
     {
-        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
         {
-            e.Effects = DragDropEffects.Copy;
+            e.Effects = System.Windows.DragDropEffects.Copy;
         }
         else
         {
-            e.Effects = DragDropEffects.None;
+            e.Effects = System.Windows.DragDropEffects.None;
         }
         e.Handled = true;
     }
 
-    private void Window_Drop(object sender, DragEventArgs e)
+    private void Window_Drop(object sender, System.Windows.DragEventArgs e)
     {
-        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
         {
-            var files = (string[]?)e.Data.GetData(DataFormats.FileDrop);
+            var files = (string[]?)e.Data.GetData(System.Windows.DataFormats.FileDrop);
             if (files is { Length: > 0 })
             {
                 var viewModel = DataContext as MainViewModel;
