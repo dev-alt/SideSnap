@@ -1,0 +1,107 @@
+<Window x:Class="SideSnap.Views.AddTodoDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add Feature/Todo"
+        Width="450"
+        Height="350"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#F0F0F0">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title -->
+        <TextBlock Grid.Row="0"
+                   Text="Add Feature/Todo"
+                   FontSize="18"
+                   FontWeight="Bold"
+                   Margin="0,0,0,20"/>
+
+        <!-- Category -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,15">
+            <TextBlock Text="Category:"
+                      FontWeight="Bold"
+                      Margin="0,0,0,5"/>
+            <ComboBox x:Name="CategoryComboBox"
+                     IsEditable="True"
+                     FontSize="12"
+                     Height="32">
+                <ComboBoxItem Content="UI/UX Improvements"/>
+                <ComboBoxItem Content="Label &amp; Display Features"/>
+                <ComboBoxItem Content="Functionality Enhancements"/>
+                <ComboBoxItem Content="PowerShell Command Features"/>
+                <ComboBoxItem Content="System Integration"/>
+                <ComboBoxItem Content="Settings &amp; Configuration"/>
+                <ComboBoxItem Content="Performance &amp; Reliability"/>
+                <ComboBoxItem Content="Advanced Features"/>
+            </ComboBox>
+        </StackPanel>
+
+        <!-- Description -->
+        <StackPanel Grid.Row="2" Margin="0,0,0,15">
+            <TextBlock Text="Description:"
+                      FontWeight="Bold"
+                      Margin="0,0,0,5"/>
+            <TextBox x:Name="DescriptionTextBox"
+                    Padding="8"
+                    FontSize="12"
+                    Height="100"
+                    TextWrapping="Wrap"
+                    AcceptsReturn="True"
+                    VerticalScrollBarVisibility="Auto"/>
+        </StackPanel>
+
+        <!-- Priority -->
+        <StackPanel Grid.Row="3" Margin="0,0,0,15">
+            <TextBlock Text="Priority:"
+                      FontWeight="Bold"
+                      Margin="0,0,0,5"/>
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="HighPriorityRadio"
+                            Content="🔴 High"
+                            GroupName="Priority"
+                            Margin="0,0,20,0"
+                            VerticalAlignment="Center"/>
+                <RadioButton x:Name="MediumPriorityRadio"
+                            Content="🟡 Medium"
+                            GroupName="Priority"
+                            IsChecked="True"
+                            Margin="0,0,20,0"
+                            VerticalAlignment="Center"/>
+                <RadioButton x:Name="LowPriorityRadio"
+                            Content="🔵 Low"
+                            GroupName="Priority"
+                            VerticalAlignment="Center"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="5"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button Content="Add"
+                   Click="AddButton_Click"
+                   Width="80"
+                   Height="35"
+                   Margin="0,0,10,0"
+                   Style="{StaticResource ModernButton}"/>
+            <Button Content="Cancel"
+                   Click="CancelButton_Click"
+                   Width="80"
+                   Height="35"
+                   Background="#95A5A6"
+                   Foreground="White"
+                   BorderThickness="0"
+                   Cursor="Hand"/>
+        </StackPanel>
+
+    </Grid>
+</Window>

@@ -112,20 +112,20 @@
                                         </ToolTip>
                                     </Button.ToolTip>
                                     <Button.ContextMenu>
-                                        <ContextMenu DataContext="{Binding}">
+                                        <ContextMenu>
                                             <MenuItem Header="Edit"
                                                      Command="{Binding DataContext.EditShortcutCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <MenuItem Header="Move Up"
                                                      Command="{Binding DataContext.MoveShortcutUpCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <MenuItem Header="Move Down"
                                                      Command="{Binding DataContext.MoveShortcutDownCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <Separator/>
                                             <MenuItem Header="Delete"
                                                      Command="{Binding DataContext.RemoveShortcutCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
@@ -176,20 +176,20 @@
                                         </ToolTip>
                                     </Button.ToolTip>
                                     <Button.ContextMenu>
-                                        <ContextMenu DataContext="{Binding}">
+                                        <ContextMenu>
                                             <MenuItem Header="Edit"
                                                      Command="{Binding DataContext.EditCommandCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <MenuItem Header="Move Up"
                                                      Command="{Binding DataContext.MoveCommandUpCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <MenuItem Header="Move Down"
                                                      Command="{Binding DataContext.MoveCommandDownCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             <Separator/>
                                             <MenuItem Header="Delete"
                                                      Command="{Binding DataContext.RemoveCommandCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding}"/>
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
@@ -219,14 +219,25 @@
 
             <!-- Settings Button (above taskbar) -->
             <Border Grid.Row="2" Background="#34495E" Padding="5">
-                <Button Content="⚙ Settings"
-                       Click="SettingsButton_Click"
-                       Foreground="White"
-                       Background="Transparent"
-                       BorderThickness="0"
-                       FontSize="11"
-                       HorizontalAlignment="Center"
-                       Cursor="Hand"/>
+                <StackPanel>
+                    <Button Content="📋 Features"
+                           Command="{Binding OpenTodoTrackerCommand}"
+                           Foreground="White"
+                           Background="Transparent"
+                           BorderThickness="0"
+                           FontSize="11"
+                           HorizontalAlignment="Center"
+                           Cursor="Hand"
+                           Margin="0,0,0,5"/>
+                    <Button Content="⚙ Settings"
+                           Click="SettingsButton_Click"
+                           Foreground="White"
+                           Background="Transparent"
+                           BorderThickness="0"
+                           FontSize="11"
+                           HorizontalAlignment="Center"
+                           Cursor="Hand"/>
+                </StackPanel>
             </Border>
 
             <!-- Taskbar Spacer (transparent and click-through) -->

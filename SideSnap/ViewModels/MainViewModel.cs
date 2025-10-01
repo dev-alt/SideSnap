@@ -257,6 +257,14 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private void OpenTodoTracker()
+    {
+        var todoWindow = _serviceProvider.GetRequiredService<TodoWindow>();
+        todoWindow.Show();
+        _logger.LogInformation("Opened todo tracker window");
+    }
+
     private void ReorderShortcuts()
     {
         for (int i = 0; i < Shortcuts.Count; i++)
