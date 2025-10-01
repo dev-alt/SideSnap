@@ -66,12 +66,22 @@ public class CommandExecutorService : ICommandExecutorService
             var startInfo = new ProcessStartInfo
             {
                 FileName = "powershell.exe",
-                Arguments = $"-NoProfile -Command \"{command.Command}\"",
                 UseShellExecute = false,
                 CreateNoWindow = command.RunHidden,
                 RedirectStandardOutput = command.RunHidden,
                 RedirectStandardError = command.RunHidden
             };
+
+            // When not hidden, use -NoExit to keep window open
+            if (command.RunHidden)
+            {
+                startInfo.Arguments = $"-NoProfile -Command \"{command.Command}\"";
+            }
+            else
+            {
+                // Use -NoExit to keep window open after execution
+                startInfo.Arguments = $"-NoExit -Command \"{command.Command}\"";
+            }
 
             if (command.RequiresElevation)
             {
