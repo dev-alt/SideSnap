@@ -103,21 +103,29 @@
                                        Margin="5,3"
                                        HorizontalAlignment="Stretch"
                                        Style="{StaticResource SidebarButton}">
+                                    <Button.ToolTip>
+                                        <ToolTip>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding Path}" FontSize="10" Opacity="0.8" TextWrapping="Wrap" MaxWidth="200"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </Button.ToolTip>
                                     <Button.ContextMenu>
-                                        <ContextMenu>
+                                        <ContextMenu DataContext="{Binding}">
                                             <MenuItem Header="Edit"
                                                      Command="{Binding DataContext.EditShortcutCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                                     CommandParameter="{Binding}"/>
                                             <MenuItem Header="Move Up"
                                                      Command="{Binding DataContext.MoveShortcutUpCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                                     CommandParameter="{Binding}"/>
                                             <MenuItem Header="Move Down"
                                                      Command="{Binding DataContext.MoveShortcutDownCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                                     CommandParameter="{Binding}"/>
                                             <Separator/>
                                             <MenuItem Header="Delete"
                                                      Command="{Binding DataContext.RemoveShortcutCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                                     CommandParameter="{Binding}"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
@@ -127,6 +135,7 @@
                                               Margin="0,0,0,5"
                                               RenderOptions.BitmapScalingMode="HighQuality"/>
                                         <TextBlock Text="{Binding Name}"
+                                                  Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
                                                   TextWrapping="Wrap"
                                                   TextAlignment="Center"
                                                   FontSize="9"
@@ -158,21 +167,29 @@
                                        Margin="5,3"
                                        HorizontalAlignment="Stretch"
                                        Style="{StaticResource SidebarButton}">
+                                    <Button.ToolTip>
+                                        <ToolTip>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding Command}" FontSize="10" Opacity="0.8" TextWrapping="Wrap" MaxWidth="200"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </Button.ToolTip>
                                     <Button.ContextMenu>
-                                        <ContextMenu>
+                                        <ContextMenu DataContext="{Binding}">
                                             <MenuItem Header="Edit"
                                                      Command="{Binding DataContext.EditCommandCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                                     CommandParameter="{Binding}"/>
                                             <MenuItem Header="Move Up"
                                                      Command="{Binding DataContext.MoveCommandUpCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                                     CommandParameter="{Binding}"/>
                                             <MenuItem Header="Move Down"
                                                      Command="{Binding DataContext.MoveCommandDownCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                                     CommandParameter="{Binding}"/>
                                             <Separator/>
                                             <MenuItem Header="Delete"
                                                      Command="{Binding DataContext.RemoveCommandCommand, Source={x:Reference RootWindow}}"
-                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+                                                     CommandParameter="{Binding}"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
@@ -181,6 +198,7 @@
                                                   TextAlignment="Center"
                                                   Margin="0,0,0,5"/>
                                         <TextBlock Text="{Binding Name}"
+                                                  Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
                                                   TextWrapping="Wrap"
                                                   TextAlignment="Center"
                                                   FontSize="9"
