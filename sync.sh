@@ -4,7 +4,7 @@
 # Excludes build artifacts and unnecessary files
 
 SOURCE_DIR="/root/projects/SideLaunch"
-DEST_DIR="/mnt/c/Users/$USER/Desktop/Projects/SideSnap"
+DEST_DIR="/mnt/c/Users/andre/Desktop/Projects/SideSnap"
 
 echo "Starting sync from WSL to Windows..."
 echo "Source: $SOURCE_DIR"

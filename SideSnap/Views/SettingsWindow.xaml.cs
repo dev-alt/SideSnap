@@ -3,7 +3,7 @@ using SideSnap.ViewModels;
 
 namespace SideSnap.Views;
 
-public partial class SettingsWindow
+public partial class SettingsWindow : Window
 {
     private readonly SettingsViewModel _viewModel;
 

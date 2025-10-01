@@ -18,14 +18,14 @@ public partial class MainWindow : Window
     private readonly IServiceProvider _serviceProvider;
     private readonly ISettingsService _settingsService;
     private readonly DispatcherTimer _hideTimer;
-    private const int WmWindowPosChanging = 0x0046;
+    private const int WM_WINDOWPOSCHANGING = 0x0046;
     private const double CollapsedWidth = 5;
     private const double ExpandedWidth = 105;
     private bool _isAutoHideEnabled;
     private bool _isExpanded = true;
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct Windowpos
+    private struct WINDOWPOS
     {
         public IntPtr hwnd;
         public IntPtr hwndInsertAfter;
@@ -86,9 +86,9 @@ public partial class MainWindow : Window
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (msg == WmWindowPosChanging)
+        if (msg == WM_WINDOWPOSCHANGING)
         {
-            var windowPos = Marshal.PtrToStructure<Windowpos>(lParam);
+            var windowPos = Marshal.PtrToStructure<WINDOWPOS>(lParam);
 
             // Lock position to (0, 0) but allow width changes for auto-hide
             if (windowPos.x != 0 || windowPos.y != 0)
@@ -144,7 +144,8 @@ public partial class MainWindow : Window
             var files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
             if (files != null && files.Length > 0)
             {
-                if (DataContext is MainViewModel viewModel)
+                var viewModel = DataContext as MainViewModel;
+                if (viewModel != null)
                 {
                     foreach (var file in files)
                     {

@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace SideSnap.Views;
 
-public partial class AddShortcutDialog
+public partial class AddShortcutDialog : Window
 {
     public string ShortcutName { get; private set; } = string.Empty;
     public string ShortcutPath { get; private set; } = string.Empty;
@@ -15,24 +15,27 @@ public partial class AddShortcutDialog
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)
     {
-        using var dialog = new FolderBrowserDialog();
-        dialog.Description = "Select a folder";
-        dialog.UseDescriptionForTitle = true;
-        dialog.ShowNewFolderButton = true;
-        dialog.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        var result = dialog.ShowDialog();
-        if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.SelectedPath))
+        var dialog = new OpenFileDialog
         {
-            PathTextBox.Text = dialog.SelectedPath;
+            Title = "Select Folder or File",
+            Filter = "All Files (*.*)|*.*",
+            CheckFileExists = false,
+            CheckPathExists = true
+        };
+
+        // Try to use folder browser instead
+        using var folderDialog = new System.Windows.Forms.FolderBrowserDialog
+        {
+            Description = "Select a folder",
+            ShowNewFolderButton = true
+        };
+
+        if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+        {
+            PathTextBox.Text = folderDialog.SelectedPath;
             if (string.IsNullOrWhiteSpace(NameTextBox.Text))
             {
-                var trimmed = dialog.SelectedPath.TrimEnd(Path.DirectorySeparatorChar);
-                var name = Path.GetFileName(trimmed);
-                if (string.IsNullOrEmpty(name))
-                {
-                    name = trimmed;
-                }
-                NameTextBox.Text = name;
+                NameTextBox.Text = Path.GetFileName(folderDialog.SelectedPath);
             }
         }
     }

@@ -12,7 +12,7 @@ public class WindowManagerService : IWindowManagerService
 
     // Win32 API imports
     [DllImport("user32.dll")]
-    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
     [DllImport("user32.dll")]
     private static extern IntPtr FindWindow(string? lpClassName, string lpWindowName);
@@ -30,24 +30,24 @@ public class WindowManagerService : IWindowManagerService
     private static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
 
     [DllImport("user32.dll")]
-    private static extern bool GetWindowRect(IntPtr hWnd, out Rect lpRect);
+    private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
     [DllImport("user32.dll")]
     private static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
 
     [DllImport("user32.dll")]
-    private static extern bool GetMonitorInfo(IntPtr hMonitor, ref Monitorinfo lpmi);
+    private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
 
     [DllImport("user32.dll")]
     private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, IntPtr dwData);
 
     private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-    private delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
+    private delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
 
-    private const uint MonitorDefaulttonearest = 2;
+    private const uint MONITOR_DEFAULTTONEAREST = 2;
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct Rect
+    private struct RECT
     {
         public int Left;
         public int Top;
@@ -56,17 +56,17 @@ public class WindowManagerService : IWindowManagerService
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    private struct Monitorinfo
+    private struct MONITORINFO
     {
         public int cbSize;
-        public Rect rcMonitor;
-        public Rect rcWork;
+        public RECT rcMonitor;
+        public RECT rcWork;
         public uint dwFlags;
     }
 
-    private const uint SwpNosize = 0x0001;
-    private const uint SwpNozorder = 0x0004;
-    private const uint SwpShowwindow = 0x0040;
+    private const uint SWP_NOSIZE = 0x0001;
+    private const uint SWP_NOZORDER = 0x0004;
+    private const uint SWP_SHOWWINDOW = 0x0040;
 
     public WindowManagerService()
     {
@@ -123,7 +123,7 @@ public class WindowManagerService : IWindowManagerService
             var hwnd = FindWindowByProcessName(processName);
             if (hwnd != IntPtr.Zero)
             {
-                SetWindowPos(hwnd, IntPtr.Zero, position.X, position.Y, position.Width, position.Height, SwpNozorder | SwpShowwindow);
+                SetWindowPos(hwnd, IntPtr.Zero, position.X, position.Y, position.Width, position.Height, SWP_NOZORDER | SWP_SHOWWINDOW);
             }
         }
     }
@@ -132,7 +132,7 @@ public class WindowManagerService : IWindowManagerService
     {
         IntPtr foundWindow = IntPtr.Zero;
 
-        EnumWindows((hWnd, _) =>
+        EnumWindows((hWnd, lParam) =>
         {
             if (IsWindowVisible(hWnd))
             {
@@ -166,7 +166,7 @@ public class WindowManagerService : IWindowManagerService
     public WindowPosition? GetCurrentWindowPosition(string processName)
     {
         var hwnd = FindWindowByProcessName(processName);
-        if (hwnd != IntPtr.Zero && GetWindowRect(hwnd, out Rect rect))
+        if (hwnd != IntPtr.Zero && GetWindowRect(hwnd, out RECT rect))
         {
             var monitorIndex = GetMonitorIndex(hwnd);
             return new WindowPosition
@@ -184,7 +184,7 @@ public class WindowManagerService : IWindowManagerService
 
     private int GetMonitorIndex(IntPtr hwnd)
     {
-        var hMonitor = MonitorFromWindow(hwnd, MonitorDefaulttonearest);
+        var hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
         var monitors = GetAllMonitors();
 
         for (int i = 0; i < monitors.Count; i++)
@@ -197,17 +197,16 @@ public class WindowManagerService : IWindowManagerService
         return 0;
     }
 
-    private List<(IntPtr, Rect)> GetAllMonitors()
+    private List<(IntPtr, RECT)> GetAllMonitors()
     {
-        var monitors = new List<(IntPtr, Rect)>();
+        var monitors = new List<(IntPtr, RECT)>();
 
-        bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData)
+        EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (hMonitor, hdcMonitor, ref RECT lprcMonitor, dwData) =>
         {
             monitors.Add((hMonitor, lprcMonitor));
             return true;
-        }
+        }, IntPtr.Zero);
 
-        EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, MonitorEnumProc, IntPtr.Zero);
         return monitors;
     }
 
@@ -232,11 +231,11 @@ public class WindowManagerService : IWindowManagerService
         {
             if (width.HasValue && height.HasValue)
             {
-                SetWindowPos(hwnd, IntPtr.Zero, x, y, width.Value, height.Value, SwpNozorder | SwpShowwindow);
+                SetWindowPos(hwnd, IntPtr.Zero, x, y, width.Value, height.Value, SWP_NOZORDER | SWP_SHOWWINDOW);
             }
             else
             {
-                SetWindowPos(hwnd, IntPtr.Zero, x, y, 0, 0, SwpNosize | SwpNozorder | SwpShowwindow);
+                SetWindowPos(hwnd, IntPtr.Zero, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW);
             }
         }
     }

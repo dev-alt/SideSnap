@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Windows.Data;
+using System.Windows.Media;
 using Microsoft.Extensions.DependencyInjection;
 using SideSnap.Services;
 
@@ -14,7 +15,7 @@ public class PathToIconConverter : IValueConverter
         _iconService = serviceProvider.GetRequiredService<IIconService>();
     }
 
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (_iconService == null || value is not string path || string.IsNullOrWhiteSpace(path))
             return null;
@@ -22,7 +23,7 @@ public class PathToIconConverter : IValueConverter
         return _iconService.GetIcon(path);
     }
 
-    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }

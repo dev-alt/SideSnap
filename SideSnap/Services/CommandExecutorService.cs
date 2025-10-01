@@ -9,14 +9,14 @@ namespace SideSnap.Services;
 public class CommandExecutorService : ICommandExecutorService
 {
     private readonly string _commandsPath;
-    private readonly string[] _dangerousPatterns =
-    [
+    private readonly string[] _dangerousPatterns = new[]
+    {
         @"rm\s+-rf",
         @"Remove-Item.*-Recurse",
         @"Format-Volume",
         @"del\s+/[sS]",
         @"cipher\s+/w"
-    ];
+    };
 
     public CommandExecutorService()
     {
@@ -98,15 +98,11 @@ public class CommandExecutorService : ICommandExecutorService
 
     private List<PowerShellCommand> GetDefaultCommands()
     {
-        return
-        [
+        return new List<PowerShellCommand>
+        {
             new() { Name = "Open WSL", Command = "wsl", RunHidden = false },
             new() { Name = "System Info", Command = "systeminfo", RunHidden = false },
-            new()
-            {
-                Name = "Network Status", Command = "Get-NetAdapter | Select-Object Name, Status, LinkSpeed",
-                RunHidden = false
-            }
-        ];
+            new() { Name = "Network Status", Command = "Get-NetAdapter | Select-Object Name, Status, LinkSpeed", RunHidden = false }
+        };
     }
 }

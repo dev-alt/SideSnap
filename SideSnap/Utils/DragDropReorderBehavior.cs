@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -45,7 +44,7 @@ public static class DragDropReorderBehavior
     private static System.Windows.Point? _startPoint;
     private static object? _draggedItem;
 
-    private static void ItemsControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private static void ItemsControl_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         _startPoint = e.GetPosition(null);
 
@@ -67,12 +66,12 @@ public static class DragDropReorderBehavior
         if (e.LeftButton == MouseButtonState.Pressed && _startPoint.HasValue && _draggedItem != null)
         {
             System.Windows.Point currentPosition = e.GetPosition(null);
-            Vector diff = _startPoint.Value - currentPosition;
+            System.Windows.Vector diff = _startPoint.Value - currentPosition;
 
             if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
                 Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
             {
-                DragDrop.DoDragDrop((DependencyObject)sender, _draggedItem, System.Windows.DragDropEffects.Move);
+                System.Windows.DragDrop.DoDragDrop((DependencyObject)sender, _draggedItem, System.Windows.DragDropEffects.Move);
                 _draggedItem = null;
                 _startPoint = null;
             }
@@ -81,10 +80,9 @@ public static class DragDropReorderBehavior
 
     private static void ItemsControl_Drop(object sender, System.Windows.DragEventArgs e)
     {
-         var formats = e.Data.GetFormats();
-        if (sender is ItemsControl itemsControl && formats is { Length: > 0 } && e.Data.GetDataPresent(formats[0]))
+        if (sender is ItemsControl itemsControl && e.Data.GetDataPresent(e.Data.GetFormats()[0]))
         {
-            var droppedData = e.Data.GetData(formats[0]);
+            var droppedData = e.Data.GetData(e.Data.GetFormats()[0]);
 
             // Find the target item
             var element = e.OriginalSource as DependencyObject;
@@ -98,7 +96,8 @@ public static class DragDropReorderBehavior
                 var targetItem = presenter.Content;
 
                 // Get the source collection
-                if (itemsControl.ItemsSource is IList source && source.Contains(droppedData) && source.Contains(targetItem))
+                var source = itemsControl.ItemsSource as System.Collections.IList;
+                if (source != null && source.Contains(droppedData) && source.Contains(targetItem))
                 {
                     int oldIndex = source.IndexOf(droppedData);
                     int newIndex = source.IndexOf(targetItem);

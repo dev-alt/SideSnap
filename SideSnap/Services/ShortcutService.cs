@@ -62,19 +62,11 @@ public class ShortcutService : IShortcutService
 
     private List<FolderShortcut> GetDefaultShortcuts()
     {
-        return
-        [
-            new()
-            {
-                Name = "Documents", Path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Order = 0
-            },
-            new()
-            {
-                Name = "Downloads",
-                Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"),
-                Order = 1
-            },
+        return new List<FolderShortcut>
+        {
+            new() { Name = "Documents", Path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Order = 0 },
+            new() { Name = "Downloads", Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"), Order = 1 },
             new() { Name = "Desktop", Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Order = 2 }
-        ];
+        };
     }
 }

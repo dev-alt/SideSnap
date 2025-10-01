@@ -7,111 +7,67 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Create log file with timestamp
-$timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
-$logFile = "build-log_$timestamp.txt"
-
-function Write-LoggedHost {
-    param(
-        [string]$Message,
-        [string]$ForegroundColor = "White"
-    )
-    
-    # Write to console with color
-    Write-Host $Message -ForegroundColor $ForegroundColor
-    
-    # Write to log file (without color codes)
-    $Message | Out-File -FilePath $logFile -Append -Encoding UTF8
-}
-
 function Wait-ForKeyPress {
-    Write-LoggedHost "" 
-    Write-LoggedHost "Press any key to exit..." "Yellow"
+    Write-Host ""
+    Write-Host "Press any key to exit..." -ForegroundColor Yellow
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
 try {
-    # Initialize log file
-    "SideSnap Build Log - $(Get-Date)" | Out-File -FilePath $logFile -Encoding UTF8
-    "=" * 50 | Out-File -FilePath $logFile -Append -Encoding UTF8
-    
-    Write-LoggedHost "=====================================" "Cyan"
-    Write-LoggedHost "       SideSnap Build Script        " "Cyan"
-    Write-LoggedHost "=====================================" "Cyan"
-    Write-LoggedHost "Log file: $logFile" "Gray"
-    Write-LoggedHost ""
+    Write-Host "=====================================" -ForegroundColor Cyan
+    Write-Host "       SideSnap Build Script        " -ForegroundColor Cyan
+    Write-Host "=====================================" -ForegroundColor Cyan
+    Write-Host ""
 
     # Navigate to script directory
     $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
     Set-Location $scriptPath
 
     # Clean
-    Write-LoggedHost "Cleaning solution..." "Yellow"
-    $cleanOutput = dotnet clean SideSnap.sln --configuration Release 2>&1 | Out-String
-    $cleanOutput | Out-File -FilePath $logFile -Append -Encoding UTF8
-    Write-Host $cleanOutput
-    
+    Write-Host "Cleaning solution..." -ForegroundColor Yellow
+    dotnet clean SideSnap.sln --configuration Release 2>&1 | Out-String | Write-Host
     if ($LASTEXITCODE -ne 0) {
         throw "Clean failed with exit code $LASTEXITCODE"
     }
-    Write-LoggedHost "Clean completed successfully!" "Green"
-    Write-LoggedHost ""
+    Write-Host "Clean completed successfully!" -ForegroundColor Green
+    Write-Host ""
 
     # Restore
-    Write-LoggedHost "Restoring packages..." "Yellow"
-    $restoreOutput = dotnet restore SideSnap.sln 2>&1 | Out-String
-    $restoreOutput | Out-File -FilePath $logFile -Append -Encoding UTF8
-    Write-Host $restoreOutput
-    
+    Write-Host "Restoring packages..." -ForegroundColor Yellow
+    dotnet restore SideSnap.sln 2>&1 | Out-String | Write-Host
     if ($LASTEXITCODE -ne 0) {
         throw "Restore failed with exit code $LASTEXITCODE"
     }
-    Write-LoggedHost "Restore completed successfully!" "Green"
-    Write-LoggedHost ""
+    Write-Host "Restore completed successfully!" -ForegroundColor Green
+    Write-Host ""
 
     # Build
-    Write-LoggedHost "Building solution..." "Yellow"
-    $buildOutput = dotnet build SideSnap.sln --configuration Release --no-restore 2>&1 | Out-String
-    $buildOutput | Out-File -FilePath $logFile -Append -Encoding UTF8
-    Write-Host $buildOutput
-    
+    Write-Host "Building solution..." -ForegroundColor Yellow
+    dotnet build SideSnap.sln --configuration Release --no-restore 2>&1 | Out-String | Write-Host
     if ($LASTEXITCODE -ne 0) {
         throw "Build failed with exit code $LASTEXITCODE"
     }
-    Write-LoggedHost "Build completed successfully!" "Green"
-    Write-LoggedHost ""
+    Write-Host "Build completed successfully!" -ForegroundColor Green
+    Write-Host ""
 
     # Run
     if (-not $SkipRun) {
-        Write-LoggedHost "Running SideSnap..." "Cyan"
-        Write-LoggedHost ""
-        $runOutput = dotnet run --project SideSnap\SideSnap.csproj --configuration Release --no-build 2>&1 | Out-String
-        $runOutput | Out-File -FilePath $logFile -Append -Encoding UTF8
-        Write-Host $runOutput
-        
+        Write-Host "Running SideSnap..." -ForegroundColor Cyan
+        Write-Host ""
+        dotnet run --project SideSnap\SideSnap.csproj --configuration Release --no-build 2>&1 | Out-String | Write-Host
         if ($LASTEXITCODE -ne 0) {
             throw "Application exited with exit code $LASTEXITCODE"
         }
     } else {
-        Write-LoggedHost "Skipping run. Use './build.ps1' without -SkipRun to launch the app." "Yellow"
+        Write-Host "Skipping run. Use './build.ps1' without -SkipRun to launch the app." -ForegroundColor Yellow
         Wait-ForKeyPress
     }
 }
 catch {
-    Write-LoggedHost ""
-    Write-LoggedHost "=====================================" "Red"
-    Write-LoggedHost "ERROR: $($_.Exception.Message)" "Red"
-    Write-LoggedHost "=====================================" "Red"
-    
-    # Also log the error
-    "" | Out-File -FilePath $logFile -Append -Encoding UTF8
-    "ERROR: $($_.Exception.Message)" | Out-File -FilePath $logFile -Append -Encoding UTF8
-    
+    Write-Host ""
+    Write-Host "=====================================" -ForegroundColor Red
+    Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "=====================================" -ForegroundColor Red
     Wait-ForKeyPress
     exit 1
 }
-
-# Log completion
-"Build script completed at $(Get-Date)" | Out-File -FilePath $logFile -Append -Encoding UTF8
-Write-LoggedHost ""
-Write-LoggedHost "Build log saved to: $logFile" "Green"
