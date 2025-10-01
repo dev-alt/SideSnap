@@ -407,13 +407,29 @@ public partial class MainViewModel : ViewModelBase
     private static string ConvertToWslPath(string windowsPath)
     {
         // Convert Windows path to WSL path format
-        // C:\Users\... -> /mnt/c/Users/...
+
+        // Handle WSL UNC paths: \\wsl.localhost\Ubuntu-22.04\path -> /path
+        // or \\wsl$\Ubuntu-22.04\path -> /path
+        if (windowsPath.StartsWith(@"\\wsl.localhost\", StringComparison.OrdinalIgnoreCase) ||
+            windowsPath.StartsWith(@"\\wsl$\", StringComparison.OrdinalIgnoreCase))
+        {
+            var parts = windowsPath.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 3)
+            {
+                // Skip "wsl.localhost" (or "wsl$") and distribution name, take the rest
+                var pathPart = string.Join("/", parts.Skip(2));
+                return "/" + pathPart;
+            }
+        }
+
+        // Handle regular Windows paths: C:\Users\... -> /mnt/c/Users/...
         if (windowsPath.Length >= 2 && windowsPath[1] == ':')
         {
             var drive = char.ToLower(windowsPath[0]);
             var pathPart = windowsPath.Substring(2).Replace('\\', '/');
             return $"/mnt/{drive}{pathPart}";
         }
+
         return windowsPath.Replace('\\', '/');
     }
 }
