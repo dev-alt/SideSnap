@@ -39,6 +39,18 @@ try {
     $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
     Set-Location $scriptPath
 
+    # Git Pull
+    Write-Log "Pulling latest changes from git..." -Color Yellow
+    $pullOutput = git pull 2>&1 | Out-String
+    Add-Content -Path $logFile -Value $pullOutput
+    Write-Host $pullOutput
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "Git pull had issues (exit code $LASTEXITCODE), continuing anyway..." -Color Yellow
+    } else {
+        Write-Log "Git pull completed!" -Color Green
+    }
+    Write-Log ""
+
     # Clean
     Write-Log "Cleaning solution..." -Color Yellow
     $cleanOutput = dotnet clean SideSnap.sln --configuration Release 2>&1 | Out-String
