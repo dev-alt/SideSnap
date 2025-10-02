@@ -312,8 +312,14 @@ public partial class MainWindow
         BeginAnimation(WidthProperty, animation);
     }
 
+    private System.Windows.Controls.Primitives.Popup? _currentOpenPopup;
+    private DispatcherTimer? _popupCloseTimer;
+
     private void ProjectButton_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
     {
+        // Cancel any pending close
+        _popupCloseTimer?.Stop();
+
         if (sender is System.Windows.Controls.Button button && button.DataContext is Models.Project project)
         {
             // Find the popup in the visual tree
@@ -323,6 +329,7 @@ public partial class MainWindow
                 var popup = grid.FindName("ProjectDropdown") as System.Windows.Controls.Primitives.Popup;
                 if (popup != null)
                 {
+                    _currentOpenPopup = popup;
                     popup.IsOpen = true;
                 }
             }
@@ -331,25 +338,34 @@ public partial class MainWindow
 
     private void ProjectButton_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        // Delay closing to allow mouse to move to popup
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
-        timer.Tick += (s, args) =>
+        // Start a timer to close the popup if mouse doesn't enter it
+        _popupCloseTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
+        _popupCloseTimer.Tick += (s, args) =>
         {
-            timer.Stop();
-            if (sender is System.Windows.Controls.Button button)
+            _popupCloseTimer?.Stop();
+            if (_currentOpenPopup != null && !_currentOpenPopup.IsMouseOver)
             {
-                var grid = button.Parent as System.Windows.Controls.Grid;
-                if (grid != null)
-                {
-                    var popup = grid.FindName("ProjectDropdown") as System.Windows.Controls.Primitives.Popup;
-                    if (popup != null && !popup.IsMouseOver)
-                    {
-                        popup.IsOpen = false;
-                    }
-                }
+                _currentOpenPopup.IsOpen = false;
+                _currentOpenPopup = null;
             }
         };
-        timer.Start();
+        _popupCloseTimer.Start();
+    }
+
+    private void ProjectPopup_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        // Cancel the close timer when mouse enters popup
+        _popupCloseTimer?.Stop();
+    }
+
+    private void ProjectPopup_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        // Close the popup when mouse leaves it
+        if (_currentOpenPopup != null)
+        {
+            _currentOpenPopup.IsOpen = false;
+            _currentOpenPopup = null;
+        }
     }
 
     private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
