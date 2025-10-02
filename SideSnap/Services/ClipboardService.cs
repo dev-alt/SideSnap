@@ -8,7 +8,7 @@ using SideSnap.Models;
 
 namespace SideSnap.Services;
 
-public class ClipboardService : IClipboardService
+public partial class ClipboardService : IClipboardService
 {
     private readonly string _historyPath;
     private readonly ILogger<ClipboardService> _logger;

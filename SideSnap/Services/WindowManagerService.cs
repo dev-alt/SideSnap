@@ -391,8 +391,8 @@ public partial class WindowManagerService : IWindowManagerService
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern int GetWindowText(IntPtr hWnd, char[] lpString, int nMaxCount);
 
-    [DllImport("user32.dll")]
-    private static extern IntPtr GetForegroundWindow();
+    [LibraryImport("user32.dll", EntryPoint = "GetForegroundWindow")]
+    private static partial IntPtr GetForegroundWindowNative();
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -415,7 +415,7 @@ public partial class WindowManagerService : IWindowManagerService
         return length > 0 ? new string(title, 0, length) : string.Empty;
     }
 
-    public IntPtr GetForegroundWindow() => GetForegroundWindow();
+    public IntPtr GetForegroundWindow() => GetForegroundWindowNative();
 
     public bool SnapWindowToZone(SnapZone zone, int monitorIndex = 0)
     {
