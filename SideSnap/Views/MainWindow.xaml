@@ -44,7 +44,7 @@
             </Grid.RowDefinitions>
 
             <!-- Header with Exit Button -->
-            <Border Grid.Row="0" Background="#2C3E50" Height="32">
+            <Border x:Name="HeaderBorder" Grid.Row="0" Background="#2C3E50" Height="32">
                 <Button Content="✕"
                        Click="ExitButton_Click"
                        Foreground="White"
@@ -107,10 +107,16 @@
                                        Focusable="True"
                                        Style="{StaticResource SidebarButton}">
                                     <Button.ToolTip>
-                                        <ToolTip>
+                                        <ToolTip MaxWidth="300">
                                             <StackPanel>
-                                                <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
-                                                <TextBlock Text="{Binding Path}" FontSize="10" Opacity="0.8" TextWrapping="Wrap" MaxWidth="200"/>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,0,5"/>
+                                                <TextBlock Text="{Binding Path}" FontSize="9" Opacity="0.7" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                                <Border Background="#F8F9FA" Padding="8" CornerRadius="4" BorderBrush="#DEE2E6" BorderThickness="1">
+                                                    <TextBlock Text="{Binding Path, Converter={StaticResource FolderPreview}}"
+                                                              FontSize="10"
+                                                              FontFamily="Consolas"
+                                                              TextWrapping="Wrap"/>
+                                                </Border>
                                             </StackPanel>
                                         </ToolTip>
                                     </Button.ToolTip>
@@ -132,9 +138,9 @@
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <Image Width="32"
-                                              Height="32"
-                                              Margin="0,0,0,5"
+                                        <Image Width="24"
+                                              Height="24"
+                                              Margin="0,0,0,3"
                                               RenderOptions.BitmapScalingMode="HighQuality">
                                             <Image.Source>
                                                 <MultiBinding Converter="{StaticResource CustomIconConverter}">
@@ -147,8 +153,8 @@
                                                   Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
                                                   TextWrapping="Wrap"
                                                   TextAlignment="Center"
-                                                  FontSize="9"
-                                                  MaxWidth="75"/>
+                                                  FontSize="8"
+                                                  MaxWidth="85"/>
                                     </StackPanel>
                                 </Button>
                             </DataTemplate>
@@ -171,14 +177,13 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Grid d:DataContext="{d:DesignInstance Type=models:Project, IsDesignTimeCreatable=True}">
-                                    <Button Command="{Binding DataContext.ShowProjectDropdownCommand, Source={x:Reference RootWindow}}"
-                                           CommandParameter="{Binding}"
-                                           Margin="5,3"
+                                    <Button Margin="5,3"
                                            HorizontalAlignment="Stretch"
                                            Focusable="True"
                                            Style="{StaticResource SidebarButton}"
                                            MouseEnter="ProjectButton_MouseEnter"
-                                           MouseLeave="ProjectButton_MouseLeave">
+                                           MouseLeave="ProjectButton_MouseLeave"
+                                           IsHitTestVisible="True">
                                         <Button.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Edit"
@@ -191,9 +196,9 @@
                                             </ContextMenu>
                                         </Button.ContextMenu>
                                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <Image Width="32"
-                                                  Height="32"
-                                                  Margin="0,0,0,5"
+                                            <Image Width="24"
+                                                  Height="24"
+                                                  Margin="0,0,0,3"
                                                   RenderOptions.BitmapScalingMode="HighQuality">
                                                 <Image.Source>
                                                     <MultiBinding Converter="{StaticResource CustomIconConverter}">
@@ -206,8 +211,8 @@
                                                       Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
                                                       TextWrapping="Wrap"
                                                       TextAlignment="Center"
-                                                      FontSize="9"
-                                                      MaxWidth="75"/>
+                                                      FontSize="8"
+                                                      MaxWidth="85"/>
                                         </StackPanel>
                                     </Button>
 
@@ -219,17 +224,16 @@
                                            AllowsTransparency="True"
                                            HorizontalOffset="5"
                                            MouseLeave="ProjectPopup_MouseLeave">
-                                        <Border Background="#F0F0F0"
-                                               BorderBrush="#999999"
-                                               BorderThickness="2"
-                                               CornerRadius="5"
-                                               Padding="10"
-                                               MinWidth="200"
-                                               MinHeight="50"
+                                        <Border Background="White"
+                                               BorderBrush="#CCCCCC"
+                                               BorderThickness="1"
+                                               CornerRadius="0"
+                                               Padding="4"
+                                               MinWidth="180"
                                                MouseEnter="ProjectPopup_MouseEnter"
                                                MouseLeave="ProjectPopup_MouseLeave">
                                             <Border.Effect>
-                                                <DropShadowEffect ShadowDepth="3" BlurRadius="15" Opacity="0.5"/>
+                                                <DropShadowEffect ShadowDepth="2" BlurRadius="8" Opacity="0.3"/>
                                             </Border.Effect>
                                             <StackPanel>
                                                 <ItemsControl ItemsSource="{Binding Items}">
@@ -237,23 +241,20 @@
                                                         <DataTemplate>
                                                             <Button Command="{Binding DataContext.ExecuteProjectItemCommand, Source={x:Reference RootWindow}}"
                                                                    CommandParameter="{Binding}"
-                                                                   Margin="2"
-                                                                   Padding="8"
+                                                                   Margin="0"
+                                                                   Padding="8,6"
                                                                    HorizontalAlignment="Stretch"
-                                                                   Background="White"
-                                                                   BorderBrush="#CCCCCC"
-                                                                   BorderThickness="1"
+                                                                   Background="Transparent"
+                                                                   BorderThickness="0"
                                                                    Cursor="Hand">
                                                                 <Button.Style>
                                                                     <Style TargetType="Button">
-                                                                        <Setter Property="Background" Value="White"/>
+                                                                        <Setter Property="Background" Value="Transparent"/>
                                                                         <Setter Property="Template">
                                                                             <Setter.Value>
                                                                                 <ControlTemplate TargetType="Button">
                                                                                     <Border Background="{TemplateBinding Background}"
-                                                                                           BorderBrush="{TemplateBinding BorderBrush}"
-                                                                                           BorderThickness="{TemplateBinding BorderThickness}"
-                                                                                           CornerRadius="3"
+                                                                                           BorderThickness="0"
                                                                                            Padding="{TemplateBinding Padding}">
                                                                                         <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
                                                                                     </Border>
@@ -262,10 +263,10 @@
                                                                         </Setter>
                                                                         <Style.Triggers>
                                                                             <Trigger Property="IsMouseOver" Value="True">
-                                                                                <Setter Property="Background" Value="#E8F4FF"/>
+                                                                                <Setter Property="Background" Value="#E5F3FF"/>
                                                                             </Trigger>
                                                                             <Trigger Property="IsPressed" Value="True">
-                                                                                <Setter Property="Background" Value="#C8E4FF"/>
+                                                                                <Setter Property="Background" Value="#CCE8FF"/>
                                                                             </Trigger>
                                                                         </Style.Triggers>
                                                                     </Style>
@@ -341,9 +342,9 @@
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock FontSize="28"
+                                        <TextBlock FontSize="20"
                                                   TextAlignment="Center"
-                                                  Margin="0,0,0,5">
+                                                  Margin="0,0,0,3">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource CommandIconConverter}">
                                                     <Binding Path="CustomIconPath"/>
@@ -355,8 +356,8 @@
                                                   Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
                                                   TextWrapping="Wrap"
                                                   TextAlignment="Center"
-                                                  FontSize="9"
-                                                  MaxWidth="75"/>
+                                                  FontSize="8"
+                                                  MaxWidth="85"/>
                                     </StackPanel>
                                 </Button>
                             </DataTemplate>
@@ -368,6 +369,153 @@
                            Margin="5,5,5,10"
                            Style="{StaticResource AddButton}"/>
 
+                    <!-- Window Layouts Section -->
+                    <TextBlock Text="Window Layouts"
+                              FontWeight="Bold"
+                              FontSize="10"
+                              Foreground="#7F8C8D"
+                              Margin="5,10,5,5"/>
+
+                    <ItemsControl ItemsSource="{Binding Layouts}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.ApplyLayoutCommand, Source={x:Reference RootWindow}}"
+                                       CommandParameter="{Binding}"
+                                       Margin="5,2"
+                                       Style="{StaticResource SidebarButton}">
+                                    <Button.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Edit"
+                                                     Command="{Binding DataContext.EditLayoutCommand, Source={x:Reference RootWindow}}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                            <Separator/>
+                                            <MenuItem Header="Delete"
+                                                     Command="{Binding DataContext.RemoveLayoutCommand, Source={x:Reference RootWindow}}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                    <Button.ToolTip>
+                                        <ToolTip>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                                <TextBlock FontSize="10" Opacity="0.8">
+                                                    <Run Text="{Binding Windows.Count, Mode=OneWay}"/>
+                                                    <Run Text="windows"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </Button.ToolTip>
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding IconPath}"
+                                                  FontSize="20"
+                                                  TextAlignment="Center"
+                                                  Margin="0,0,0,3"/>
+                                        <TextBlock Text="{Binding Name}"
+                                                  Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
+                                                  TextWrapping="Wrap"
+                                                  TextAlignment="Center"
+                                                  FontSize="8"
+                                                  MaxWidth="85"/>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Button Content="📸 Capture"
+                           Command="{Binding CaptureLayoutCommand}"
+                           Margin="5,5,5,10"
+                           Style="{StaticResource AddButton}"/>
+
+                    <!-- Window Rules Section -->
+                    <TextBlock Text="Window Rules"
+                              FontWeight="Bold"
+                              FontSize="10"
+                              Foreground="#7F8C8D"
+                              Margin="5,10,5,5"/>
+
+                    <ItemsControl ItemsSource="{Binding WindowRules}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.ToggleWindowRuleCommand, Source={x:Reference RootWindow}}"
+                                       CommandParameter="{Binding}"
+                                       Margin="5,2"
+                                       Style="{StaticResource SidebarButton}">
+                                    <Button.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Delete"
+                                                     Command="{Binding DataContext.RemoveWindowRuleCommand, Source={x:Reference RootWindow}}"
+                                                     CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                    <Button.ToolTip>
+                                        <ToolTip>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                                <TextBlock FontSize="10" Opacity="0.8">
+                                                    <Run Text="Process:"/>
+                                                    <Run Text="{Binding ProcessName, Mode=OneWay}"/>
+                                                </TextBlock>
+                                                <TextBlock FontSize="10" Opacity="0.8">
+                                                    <Run Text="Action:"/>
+                                                    <Run Text="{Binding Action, Mode=OneWay}"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </Button.ToolTip>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding IsEnabled, Converter={StaticResource BoolToIcon}}"
+                                                  FontSize="14"
+                                                  Margin="0,0,6,0"
+                                                  VerticalAlignment="Center"
+                                                  Foreground="{Binding IsEnabled, Converter={StaticResource BoolToColor}}"/>
+                                        <TextBlock Text="{Binding Name}"
+                                                  FontSize="10"
+                                                  VerticalAlignment="Center"
+                                                  TextTrimming="CharacterEllipsis"
+                                                  MaxWidth="65"/>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Button Content="➕ Add Rule"
+                           Command="{Binding AddWindowRuleCommand}"
+                           Margin="5,5,5,10"
+                           Style="{StaticResource AddButton}"/>
+
+                    <!-- Snap Zones Section -->
+                    <TextBlock Text="Window Snap"
+                              FontWeight="Bold"
+                              FontSize="10"
+                              Foreground="#7F8C8D"
+                              Margin="5,10,5,5"/>
+
+                    <ItemsControl ItemsSource="{Binding SnapZones}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.SnapToZoneCommand, Source={x:Reference RootWindow}}"
+                                       CommandParameter="{Binding}"
+                                       Margin="5,2"
+                                       Style="{StaticResource SidebarButton}">
+                                    <Button.ToolTip>
+                                        <ToolTip Content="{Binding Name}"/>
+                                    </Button.ToolTip>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding Icon}"
+                                                  FontSize="16"
+                                                  Margin="0,0,8,0"
+                                                  VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Name}"
+                                                  FontSize="10"
+                                                  VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
                 </StackPanel>
             </ScrollViewer>
 
@@ -376,6 +524,24 @@
                 <StackPanel>
                     <Button Content="📋 Features"
                            Command="{Binding OpenTodoTrackerCommand}"
+                           Foreground="White"
+                           Background="Transparent"
+                           BorderThickness="0"
+                           FontSize="11"
+                           HorizontalAlignment="Center"
+                           Cursor="Hand"
+                           Margin="0,0,0,5"/>
+                    <Button Content="📝 Notes"
+                           Command="{Binding OpenQuickNotesCommand}"
+                           Foreground="White"
+                           Background="Transparent"
+                           BorderThickness="0"
+                           FontSize="11"
+                           HorizontalAlignment="Center"
+                           Cursor="Hand"
+                           Margin="0,0,0,5"/>
+                    <Button Content="📋 Clipboard"
+                           Command="{Binding OpenClipboardHistoryCommand}"
                            Foreground="White"
                            Background="Transparent"
                            BorderThickness="0"

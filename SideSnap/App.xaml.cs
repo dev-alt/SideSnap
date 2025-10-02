@@ -40,6 +40,11 @@ public partial class App
         trayService.Initialize();
         logger.LogInformation("Tray service initialized");
 
+        // Start clipboard monitoring
+        var clipboardService = _serviceProvider.GetRequiredService<IClipboardService>();
+        clipboardService.StartMonitoring();
+        logger.LogInformation("Clipboard monitoring started");
+
         var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();
         logger.LogInformation("Main window shown");
@@ -70,6 +75,9 @@ public partial class App
         services.AddSingleton<ITodoService, TodoService>();
         services.AddSingleton<IProjectService, ProjectService>();
         services.AddSingleton<ILayoutService, LayoutService>();
+        services.AddSingleton<IWindowRuleService, WindowRuleService>();
+        services.AddSingleton<IQuickNotesService, QuickNotesService>();
+        services.AddSingleton<IClipboardService, ClipboardService>();
 
         // ViewModels
         services.AddSingleton<MainViewModel>();
@@ -84,6 +92,8 @@ public partial class App
         services.AddTransient<TodoWindow>();
         services.AddTransient<AddTodoDialog>();
         services.AddTransient<AddProjectDialog>();
+        services.AddTransient<QuickNotesWindow>();
+        services.AddTransient<ClipboardHistoryWindow>();
     }
 
     private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)

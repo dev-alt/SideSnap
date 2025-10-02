@@ -38,6 +38,16 @@ public interface IWindowManagerService
     /// Gets the current position and state of a window
     /// </summary>
     WindowPosition? GetWindowPosition(IntPtr hwnd);
+
+    /// <summary>
+    /// Snaps the foreground window to a predefined zone
+    /// </summary>
+    bool SnapWindowToZone(SnapZone zone, int monitorIndex = 0);
+
+    /// <summary>
+    /// Gets the foreground window handle
+    /// </summary>
+    IntPtr GetForegroundWindow();
 }
 
 /// <summary>

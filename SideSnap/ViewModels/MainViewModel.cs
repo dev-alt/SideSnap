@@ -16,6 +16,9 @@ public partial class MainViewModel : ViewModelBase
     private readonly ICommandExecutorService _commandExecutor;
     private readonly IShortcutService _shortcutService;
     private readonly IProjectService _projectService;
+    private readonly IWindowManagerService _windowManager;
+    private readonly ILayoutService _layoutService;
+    private readonly IWindowRuleService _windowRuleService;
     private readonly ILogger<MainViewModel> _logger;
     private readonly IServiceProvider _serviceProvider;
 
@@ -37,17 +40,32 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private Project? _hoveredProject;
 
+    [ObservableProperty]
+    private ObservableCollection<SnapZoneDefinition> _snapZones = [];
+
+    [ObservableProperty]
+    private ObservableCollection<WindowLayout> _layouts = [];
+
+    [ObservableProperty]
+    private ObservableCollection<WindowRule> _windowRules = [];
+
     public MainViewModel(
         ISettingsService settingsService,
         ICommandExecutorService commandExecutor,
         IShortcutService shortcutService,
         IProjectService projectService,
+        IWindowManagerService windowManager,
+        ILayoutService layoutService,
+        IWindowRuleService windowRuleService,
         ILogger<MainViewModel> logger,
         IServiceProvider serviceProvider)
     {
         _settingsService = settingsService;
         _commandExecutor = commandExecutor;
         _shortcutService = shortcutService;
+        _windowManager = windowManager;
+        _layoutService = layoutService;
+        _windowRuleService = windowRuleService;
         _projectService = projectService;
         _logger = logger;
         _serviceProvider = serviceProvider;
@@ -56,6 +74,39 @@ public partial class MainViewModel : ViewModelBase
         LoadShortcuts();
         LoadCommands();
         LoadProjects();
+        LoadLayouts();
+        LoadWindowRules();
+        InitializeSnapZones();
+
+        // Start monitoring for window rules
+        _windowRuleService.StartMonitoring();
+    }
+
+    private void LoadLayouts()
+    {
+        Layouts = _layoutService.LoadLayouts();
+    }
+
+    private void LoadWindowRules()
+    {
+        WindowRules = _windowRuleService.LoadRules();
+    }
+
+    private void InitializeSnapZones()
+    {
+        SnapZones =
+        [
+            new SnapZoneDefinition { Name = "Left Half", Icon = "⬅️", Zone = SnapZone.LeftHalf, Order = 1 },
+            new SnapZoneDefinition { Name = "Right Half", Icon = "➡️", Zone = SnapZone.RightHalf, Order = 2 },
+            new SnapZoneDefinition { Name = "Top Half", Icon = "⬆️", Zone = SnapZone.TopHalf, Order = 3 },
+            new SnapZoneDefinition { Name = "Bottom Half", Icon = "⬇️", Zone = SnapZone.BottomHalf, Order = 4 },
+            new SnapZoneDefinition { Name = "Top Left", Icon = "↖️", Zone = SnapZone.TopLeft, Order = 5 },
+            new SnapZoneDefinition { Name = "Top Right", Icon = "↗️", Zone = SnapZone.TopRight, Order = 6 },
+            new SnapZoneDefinition { Name = "Bottom Left", Icon = "↙️", Zone = SnapZone.BottomLeft, Order = 7 },
+            new SnapZoneDefinition { Name = "Bottom Right", Icon = "↘️", Zone = SnapZone.BottomRight, Order = 8 },
+            new SnapZoneDefinition { Name = "Center", Icon = "⊡", Zone = SnapZone.Center, Order = 9 },
+            new SnapZoneDefinition { Name = "Maximize", Icon = "🗖", Zone = SnapZone.Maximize, Order = 10 }
+        ];
     }
 
     [RelayCommand]
@@ -600,5 +651,188 @@ public partial class MainViewModel : ViewModelBase
     private void HideProjectDropdown()
     {
         HoveredProject = null;
+    }
+
+    [RelayCommand]
+    private void SnapToZone(SnapZoneDefinition? zone)
+    {
+        if (zone == null) return;
+
+        try
+        {
+            _windowManager.SnapWindowToZone(zone.Zone);
+            _logger.LogInformation("Snapped window to {Zone}", zone.Name);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to snap window to {Zone}", zone.Name);
+        }
+    }
+
+    [RelayCommand]
+    private void CaptureLayout()
+    {
+        try
+        {
+            var windows = _windowManager.GetOpenWindows();
+            if (windows.Count == 0)
+            {
+                _logger.LogWarning("No windows to capture");
+                return;
+            }
+
+            var layout = new WindowLayout
+            {
+                Name = $"Layout {DateTime.Now:yyyy-MM-dd HH:mm}",
+                IconPath = "🪟",
+                Order = Layouts.Count,
+                ShowLabel = true,
+                LaunchBehavior = LaunchBehavior.OnlyPosition,
+                Windows = new ObservableCollection<WindowPosition>(
+                    windows.Select(w => new WindowPosition
+                    {
+                        ProcessName = w.ProcessName,
+                        WindowTitle = w.WindowTitle,
+                        ApplicationPath = w.ApplicationPath,
+                        X = w.X,
+                        Y = w.Y,
+                        Width = w.Width,
+                        Height = w.Height,
+                        MonitorIndex = w.MonitorIndex,
+                        State = w.State
+                    }))
+            };
+
+            Layouts.Add(layout);
+            _layoutService.SaveLayouts(Layouts);
+            _logger.LogInformation("Captured layout with {Count} windows", windows.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to capture layout");
+        }
+    }
+
+    [RelayCommand]
+    private void ApplyLayout(WindowLayout? layout)
+    {
+        if (layout == null) return;
+
+        try
+        {
+            _windowManager.ApplyLayout(layout);
+            _logger.LogInformation("Applied layout: {Name}", layout.Name);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to apply layout: {Name}", layout.Name);
+        }
+    }
+
+    [RelayCommand]
+    private void EditLayout(WindowLayout? layout)
+    {
+        if (layout == null) return;
+
+        try
+        {
+            var dialog = _serviceProvider.GetRequiredService<AddProjectDialog>();
+            dialog.Title = "Edit Layout";
+            // TODO: Create dedicated layout editor dialog
+            _logger.LogInformation("Edit layout: {Name}", layout.Name);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to edit layout");
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveLayout(WindowLayout? layout)
+    {
+        if (layout == null) return;
+
+        Layouts.Remove(layout);
+        _layoutService.SaveLayouts(Layouts);
+        _logger.LogInformation("Removed layout: {Name}", layout.Name);
+    }
+
+    [RelayCommand]
+    private void AddWindowRule()
+    {
+        try
+        {
+            // Get the foreground window to pre-fill the rule
+            var hwnd = _windowManager.GetForegroundWindow();
+            var windowPos = _windowManager.GetWindowPosition(hwnd);
+
+            var rule = new WindowRule
+            {
+                Name = windowPos != null ? $"Rule for {windowPos.ProcessName}" : "New Rule",
+                ProcessName = windowPos?.ProcessName ?? "",
+                Action = RuleAction.SnapToZone,
+                SnapZone = SnapZone.LeftHalf,
+                IsEnabled = true,
+                Order = WindowRules.Count
+            };
+
+            WindowRules.Add(rule);
+            _windowRuleService.SaveRules(WindowRules);
+            _logger.LogInformation("Added window rule: {Name}", rule.Name);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to add window rule");
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleWindowRule(WindowRule? rule)
+    {
+        if (rule == null) return;
+
+        rule.IsEnabled = !rule.IsEnabled;
+        _windowRuleService.SaveRules(WindowRules);
+        _logger.LogInformation("Toggled rule '{Name}' to {State}", rule.Name, rule.IsEnabled ? "enabled" : "disabled");
+    }
+
+    [RelayCommand]
+    private void RemoveWindowRule(WindowRule? rule)
+    {
+        if (rule == null) return;
+
+        WindowRules.Remove(rule);
+        _windowRuleService.SaveRules(WindowRules);
+        _logger.LogInformation("Removed window rule: {Name}", rule.Name);
+    }
+
+    [RelayCommand]
+    private void OpenQuickNotes()
+    {
+        try
+        {
+            var notesWindow = _serviceProvider.GetRequiredService<QuickNotesWindow>();
+            notesWindow.Show();
+            _logger.LogInformation("Opened Quick Notes window");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to open Quick Notes");
+        }
+    }
+
+    [RelayCommand]
+    private void OpenClipboardHistory()
+    {
+        try
+        {
+            var clipboardWindow = _serviceProvider.GetRequiredService<ClipboardHistoryWindow>();
+            clipboardWindow.Show();
+            _logger.LogInformation("Opened Clipboard History window");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to open Clipboard History");
+        }
     }
 }

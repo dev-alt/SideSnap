@@ -3,10 +3,10 @@
 
     <!-- Sidebar Button Style -->
     <Style x:Key="SidebarButton" TargetType="Button">
-        <Setter Property="Background" Value="#FFFFFF"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="#2C3E50"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="BorderBrush" Value="#BDC3C7"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="Padding" Value="8,10"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Height" Value="55"/>
@@ -26,13 +26,15 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#ECF0F1"/>
+                <Setter Property="Background" Value="#20000000"/>
                 <Setter Property="BorderBrush" Value="#3498DB"/>
+                <Setter Property="BorderThickness" Value="1"/>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
                 <Setter Property="Background" Value="#3498DB"/>
                 <Setter Property="Foreground" Value="White"/>
                 <Setter Property="BorderBrush" Value="#2980B9"/>
+                <Setter Property="BorderThickness" Value="1"/>
             </Trigger>
         </Style.Triggers>
     </Style>

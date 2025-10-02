@@ -115,6 +115,95 @@
                             <ComboBoxItem Content="Solid"/>
                             <ComboBoxItem Content="Glass"/>
                             <ComboBoxItem Content="Acrylic"/>
+                            <ComboBoxItem Content="Gradient"/>
+                            <ComboBoxItem Content="Neumorphism"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Border>
+
+                <!-- Custom Gradient Colors -->
+                <Border Background="White"
+                        Padding="15"
+                        Margin="0,0,0,10"
+                        CornerRadius="8"
+                        BorderBrush="#BDC3C7"
+                        BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Gradient Colors"
+                                  FontWeight="Bold"
+                                  FontSize="14"
+                                  Margin="0,0,0,5"/>
+                        <TextBlock Text="Customize gradient colors (RGB format: R,G,B)"
+                                  Foreground="#7F8C8D"
+                                  FontSize="11"
+                                  TextWrapping="Wrap"
+                                  Margin="0,0,0,8"/>
+
+                        <StackPanel Margin="0,0,0,8">
+                            <TextBlock Text="Top Color" FontSize="12" Margin="0,0,0,3"/>
+                            <TextBox Text="{Binding GradientColor1, UpdateSourceTrigger=PropertyChanged}"
+                                    Padding="8"
+                                    FontFamily="Consolas"/>
+                            <Rectangle Height="20" Margin="0,3,0,0" RadiusX="3" RadiusY="3">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush Color="{Binding GradientColor1, Converter={StaticResource RgbToColor}}"/>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,8">
+                            <TextBlock Text="Middle Color" FontSize="12" Margin="0,0,0,3"/>
+                            <TextBox Text="{Binding GradientColor2, UpdateSourceTrigger=PropertyChanged}"
+                                    Padding="8"
+                                    FontFamily="Consolas"/>
+                            <Rectangle Height="20" Margin="0,3,0,0" RadiusX="3" RadiusY="3">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush Color="{Binding GradientColor2, Converter={StaticResource RgbToColor}}"/>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <TextBlock Text="Bottom Color" FontSize="12" Margin="0,0,0,3"/>
+                            <TextBox Text="{Binding GradientColor3, UpdateSourceTrigger=PropertyChanged}"
+                                    Padding="8"
+                                    FontFamily="Consolas"/>
+                            <Rectangle Height="20" Margin="0,3,0,0" RadiusX="3" RadiusY="3">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush Color="{Binding GradientColor3, Converter={StaticResource RgbToColor}}"/>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </StackPanel>
+
+                        <TextBlock Text="💡 Example: 99,102,241 (Indigo)"
+                                  FontSize="10"
+                                  Foreground="#95A5A6"
+                                  Margin="0,8,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Icon Pack Selection -->
+                <Border Background="White"
+                        Padding="15"
+                        Margin="0,0,0,10"
+                        CornerRadius="8"
+                        BorderBrush="#BDC3C7"
+                        BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Icon Pack"
+                                  FontWeight="Bold"
+                                  FontSize="14"
+                                  Margin="0,0,0,5"/>
+                        <TextBlock Text="Choose the icon style throughout the app"
+                                  Foreground="#7F8C8D"
+                                  FontSize="11"
+                                  TextWrapping="Wrap"
+                                  Margin="0,0,0,8"/>
+                        <ComboBox SelectedIndex="{Binding IconPackIndex}">
+                            <ComboBoxItem Content="📁 Default (Emoji)"/>
+                            <ComboBoxItem Content="▢ Minimal (Shapes)"/>
+                            <ComboBoxItem Content="🎨 Colorful (Icons)"/>
+                            <ComboBoxItem Content="⬢ Professional (Symbols)"/>
                         </ComboBox>
                     </StackPanel>
                 </Border>

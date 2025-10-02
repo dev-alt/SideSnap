@@ -11,11 +11,21 @@ public class AppSettings
     public AppStyle Style { get; set; } = AppStyle.Solid;
     public bool ShowLabelByDefault { get; set; } = true;
     public bool IsLocked { get; set; } = true; // Lock position and size by default
+
+    // Custom gradient colors (RGB values)
+    public string GradientColor1 { get; set; } = "99,102,241";   // Indigo
+    public string GradientColor2 { get; set; } = "168,85,247";   // Purple
+    public string GradientColor3 { get; set; } = "236,72,153";   // Pink
+
+    // Icon pack selection
+    public string IconPack { get; set; } = "Default";
 }
 
 public enum AppStyle
 {
     Solid,
     Glass,
-    Acrylic
+    Acrylic,
+    Gradient,
+    Neumorphism
 }

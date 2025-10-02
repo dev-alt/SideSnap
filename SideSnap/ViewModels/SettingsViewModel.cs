@@ -31,6 +31,18 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isLocked;
 
+    [ObservableProperty]
+    private string _gradientColor1 = "99,102,241";
+
+    [ObservableProperty]
+    private string _gradientColor2 = "168,85,247";
+
+    [ObservableProperty]
+    private string _gradientColor3 = "236,72,153";
+
+    [ObservableProperty]
+    private int _iconPackIndex;
+
     public SettingsViewModel(ISettingsService settingsService, ILogger<SettingsViewModel> logger)
     {
         _settingsService = settingsService;
@@ -49,6 +61,14 @@ public partial class SettingsViewModel : ViewModelBase
         StyleIndex = (int)settings.Style;
         ShowLabelByDefault = settings.ShowLabelByDefault;
         IsLocked = settings.IsLocked;
+        GradientColor1 = settings.GradientColor1;
+        GradientColor2 = settings.GradientColor2;
+        GradientColor3 = settings.GradientColor3;
+
+        // Map icon pack name to index
+        var packNames = new[] { "Default", "Minimal", "Colorful", "Professional" };
+        IconPackIndex = Array.IndexOf(packNames, settings.IconPack);
+        if (IconPackIndex < 0) IconPackIndex = 0;
 
         _logger.LogDebug("Settings loaded");
     }
@@ -68,7 +88,11 @@ public partial class SettingsViewModel : ViewModelBase
             ShowLabelByDefault = ShowLabelByDefault,
             IsLocked = IsLocked,
             SidebarWidth = currentSettings.SidebarWidth,
-            SidebarHeight = currentSettings.SidebarHeight
+            SidebarHeight = currentSettings.SidebarHeight,
+            GradientColor1 = GradientColor1,
+            GradientColor2 = GradientColor2,
+            GradientColor3 = GradientColor3,
+            IconPack = new[] { "Default", "Minimal", "Colorful", "Professional" }[IconPackIndex]
         };
 
         _settingsService.SaveSettings(settings);

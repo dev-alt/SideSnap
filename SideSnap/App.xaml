@@ -8,6 +8,10 @@
             <utils:ScriptTypeToIconConverter x:Key="ScriptTypeToIconConverter"/>
             <utils:CustomIconConverter x:Key="CustomIconConverter"/>
             <utils:CommandIconConverter x:Key="CommandIconConverter"/>
+            <utils:BoolToIconConverter x:Key="BoolToIcon"/>
+            <utils:BoolToColorConverter x:Key="BoolToColor"/>
+            <utils:RgbToColorConverter x:Key="RgbToColor"/>
+            <utils:FolderPreviewConverter x:Key="FolderPreview"/>
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles.xaml"/>

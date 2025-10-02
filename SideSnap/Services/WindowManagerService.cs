@@ -391,11 +391,127 @@ public partial class WindowManagerService : IWindowManagerService
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern int GetWindowText(IntPtr hWnd, char[] lpString, int nMaxCount);
 
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfo lpmi);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MonitorInfo
+    {
+        public int Size;
+        public Rect Monitor;
+        public Rect WorkArea;
+        public uint Flags;
+    }
+
     private static string GetWindowTitle(IntPtr hWnd)
     {
         const int maxLength = 256;
         var title = new char[maxLength];
         int length = GetWindowText(hWnd, title, maxLength);
         return length > 0 ? new string(title, 0, length) : string.Empty;
+    }
+
+    public IntPtr GetForegroundWindow() => GetForegroundWindow();
+
+    public bool SnapWindowToZone(SnapZone zone, int monitorIndex = 0)
+    {
+        var hwnd = GetForegroundWindow();
+        if (hwnd == IntPtr.Zero)
+            return false;
+
+        // Get monitor info
+        var monitor = MonitorFromWindow(hwnd, MonitorDefaultToNearest);
+        var monitorInfo = new MonitorInfo { Size = Marshal.SizeOf(typeof(MonitorInfo)) };
+
+        if (!GetMonitorInfo(monitor, ref monitorInfo))
+            return false;
+
+        var workArea = monitorInfo.WorkArea;
+        var workWidth = workArea.Width;
+        var workHeight = workArea.Height;
+
+        int x, y, width, height;
+
+        switch (zone)
+        {
+            case SnapZone.LeftHalf:
+                x = workArea.Left;
+                y = workArea.Top;
+                width = workWidth / 2;
+                height = workHeight;
+                break;
+
+            case SnapZone.RightHalf:
+                x = workArea.Left + workWidth / 2;
+                y = workArea.Top;
+                width = workWidth / 2;
+                height = workHeight;
+                break;
+
+            case SnapZone.TopHalf:
+                x = workArea.Left;
+                y = workArea.Top;
+                width = workWidth;
+                height = workHeight / 2;
+                break;
+
+            case SnapZone.BottomHalf:
+                x = workArea.Left;
+                y = workArea.Top + workHeight / 2;
+                width = workWidth;
+                height = workHeight / 2;
+                break;
+
+            case SnapZone.TopLeft:
+                x = workArea.Left;
+                y = workArea.Top;
+                width = workWidth / 2;
+                height = workHeight / 2;
+                break;
+
+            case SnapZone.TopRight:
+                x = workArea.Left + workWidth / 2;
+                y = workArea.Top;
+                width = workWidth / 2;
+                height = workHeight / 2;
+                break;
+
+            case SnapZone.BottomLeft:
+                x = workArea.Left;
+                y = workArea.Top + workHeight / 2;
+                width = workWidth / 2;
+                height = workHeight / 2;
+                break;
+
+            case SnapZone.BottomRight:
+                x = workArea.Left + workWidth / 2;
+                y = workArea.Top + workHeight / 2;
+                width = workWidth / 2;
+                height = workHeight / 2;
+                break;
+
+            case SnapZone.Center:
+                width = (int)(workWidth * 0.6);
+                height = (int)(workHeight * 0.6);
+                x = workArea.Left + (workWidth - width) / 2;
+                y = workArea.Top + (workHeight - height) / 2;
+                break;
+
+            case SnapZone.Maximize:
+                x = workArea.Left;
+                y = workArea.Top;
+                width = workWidth;
+                height = workHeight;
+                break;
+
+            default:
+                return false;
+        }
+
+        return SetWindowPos(hwnd, IntPtr.Zero, x, y, width, height, SwpNoZOrder | SwpShowWindow);
     }
 }

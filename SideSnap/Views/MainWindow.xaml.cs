@@ -39,6 +39,23 @@ public partial class MainWindow
         public int flags;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct Rect
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SystemParametersInfo(int uAction, int uParam, ref Rect lpvParam, int fuWinIni);
+
+    private const int SpiSetworkarea = 0x002F;
+    private const int SpiGetworkarea = 0x0030;
+    private const int SpifUpdateinifile = 0x01;
+    private const int SpifSendchange = 0x02;
+
     public MainWindow(MainViewModel viewModel, ILogger<MainWindow> logger, IServiceProvider serviceProvider)
     {
         _logger = logger;
@@ -77,7 +94,7 @@ public partial class MainWindow
         }
 
         // Apply visual style
-        ApplyVisualStyle(settings.Style);
+        ApplyVisualStyle(settings.Style, settings.DarkMode);
 
         // Setup auto-hide timer
         _hideTimer = new DispatcherTimer
@@ -86,15 +103,27 @@ public partial class MainWindow
         };
         _hideTimer.Tick += HideTimer_Tick;
 
+        // Setup popup safety timer to close orphaned popups
+        _popupSafetyTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        _popupSafetyTimer.Tick += PopupSafetyTimer_Tick;
+        _popupSafetyTimer.Start();
+
         // Hook into window messages to prevent moving
         Loaded += MainWindow_Loaded;
         MouseEnter += MainWindow_MouseEnter;
         MouseLeave += MainWindow_MouseLeave;
+        Closing += MainWindow_Closing;
 
         if (_isAutoHideEnabled)
         {
             _logger.LogInformation("Auto-hide enabled");
         }
+
+        // Reserve screen space for sidebar
+        ReserveScreenSpace();
     }
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -225,7 +254,7 @@ public partial class MainWindow
             // Reload settings
             var settings = _settingsService.LoadSettings();
             _isAutoHideEnabled = settings.AutoHide;
-            ApplyVisualStyle(settings.Style);
+            ApplyVisualStyle(settings.Style, settings.DarkMode);
 
             // Apply lock/unlock state
             if (settings.IsLocked)
@@ -247,51 +276,160 @@ public partial class MainWindow
         }
     }
 
-    private void ApplyVisualStyle(AppStyle style)
+    private void ApplyVisualStyle(AppStyle style, bool darkMode)
     {
         var border = this.FindName("MainBorder") as System.Windows.Controls.Border;
+        var header = this.FindName("HeaderBorder") as System.Windows.Controls.Border;
         if (border == null) return;
+
+        // Base colors based on theme
+        var lightBg = System.Windows.Media.Color.FromRgb(240, 240, 240);
+        var darkBg = System.Windows.Media.Color.FromRgb(30, 30, 35);
+        var baseBg = darkMode ? darkBg : lightBg;
+
+        // Update header color
+        if (header != null)
+        {
+            header.Background = new SolidColorBrush(darkMode
+                ? System.Windows.Media.Color.FromRgb(20, 20, 25)
+                : System.Windows.Media.Color.FromRgb(44, 62, 80));
+        }
 
         switch (style)
         {
             case AppStyle.Solid:
-                border.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(240, 240, 240));
-                border.Effect = new DropShadowEffect { ShadowDepth = 2, BlurRadius = 10, Opacity = 0.3 };
-                _logger.LogDebug("Applied Solid style");
+                border.Background = new SolidColorBrush(baseBg);
+                border.Effect = new DropShadowEffect
+                {
+                    ShadowDepth = 3,
+                    BlurRadius = 12,
+                    Opacity = darkMode ? 0.6 : 0.35,
+                    Color = System.Windows.Media.Color.FromRgb(0, 0, 0)
+                };
+                _logger.LogDebug("Applied Solid style (DarkMode: {DarkMode})", darkMode);
                 break;
 
             case AppStyle.Glass:
-                // Glass effect with blur
-                var glassBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(230, 240, 240, 240));
-                border.Background = glassBrush;
-                border.Effect = new BlurEffect { Radius = 0 };
+                // Enhanced glass effect with layered transparency
+                var glassGradient = new LinearGradientBrush
+                {
+                    StartPoint = new System.Windows.Point(0, 0),
+                    EndPoint = new System.Windows.Point(0, 1)
+                };
+                if (darkMode)
+                {
+                    glassGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(240, 40, 40, 50), 0));
+                    glassGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(220, 30, 30, 40), 0.5));
+                    glassGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(230, 25, 25, 35), 1));
+                }
+                else
+                {
+                    glassGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(240, 255, 255, 255), 0));
+                    glassGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(220, 240, 245, 250), 0.5));
+                    glassGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(230, 235, 240, 245), 1));
+                }
+                border.Background = glassGradient;
 
-                // Add inner glow for glass effect
                 var glassEffect = new DropShadowEffect
                 {
                     ShadowDepth = 0,
-                    BlurRadius = 15,
-                    Opacity = 0.4,
-                    Color = Colors.White
+                    BlurRadius = 25,
+                    Opacity = 0.6,
+                    Color = darkMode
+                        ? System.Windows.Media.Color.FromArgb(180, 0, 0, 0)
+                        : System.Windows.Media.Color.FromArgb(180, 255, 255, 255)
                 };
                 border.Effect = glassEffect;
-                _logger.LogDebug("Applied Glass style");
+                _logger.LogDebug("Applied Glass style (DarkMode: {DarkMode})", darkMode);
                 break;
 
             case AppStyle.Acrylic:
-                // Acrylic effect with transparency
-                var acrylicBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(200, 245, 245, 245));
-                border.Background = acrylicBrush;
+                // Improved acrylic with subtle gradient and noise simulation
+                var acrylicGradient = new LinearGradientBrush
+                {
+                    StartPoint = new System.Windows.Point(0, 0),
+                    EndPoint = new System.Windows.Point(0, 1)
+                };
+                if (darkMode)
+                {
+                    acrylicGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(210, 35, 35, 45), 0));
+                    acrylicGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(200, 30, 30, 40), 0.3));
+                    acrylicGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(190, 25, 25, 35), 0.7));
+                    acrylicGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(200, 20, 20, 30), 1));
+                }
+                else
+                {
+                    acrylicGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(210, 250, 250, 250), 0));
+                    acrylicGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(200, 245, 245, 245), 0.3));
+                    acrylicGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(190, 240, 240, 240), 0.7));
+                    acrylicGradient.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromArgb(200, 235, 235, 235), 1));
+                }
+                border.Background = acrylicGradient;
 
                 var acrylicEffect = new DropShadowEffect
                 {
-                    ShadowDepth = 2,
-                    BlurRadius = 20,
-                    Opacity = 0.5,
-                    Color = System.Windows.Media.Color.FromRgb(100, 100, 100)
+                    ShadowDepth = 4,
+                    BlurRadius = 30,
+                    Opacity = darkMode ? 0.6 : 0.4,
+                    Color = darkMode
+                        ? System.Windows.Media.Color.FromRgb(0, 0, 0)
+                        : System.Windows.Media.Color.FromRgb(120, 120, 120)
                 };
                 border.Effect = acrylicEffect;
-                _logger.LogDebug("Applied Acrylic style");
+                _logger.LogDebug("Applied Acrylic style (DarkMode: {DarkMode})", darkMode);
+                break;
+
+            case AppStyle.Gradient:
+                // Beautiful gradient with custom or default colors
+                var settings = _settingsService.LoadSettings();
+                var gradientBrush = new LinearGradientBrush
+                {
+                    StartPoint = new System.Windows.Point(0, 0),
+                    EndPoint = new System.Windows.Point(0, 1)
+                };
+
+                var color1 = ParseRgbColor(settings.GradientColor1, darkMode);
+                var color2 = ParseRgbColor(settings.GradientColor2, darkMode);
+                var color3 = ParseRgbColor(settings.GradientColor3, darkMode);
+
+                gradientBrush.GradientStops.Add(new GradientStop(color1, 0));
+                gradientBrush.GradientStops.Add(new GradientStop(color2, 0.5));
+                gradientBrush.GradientStops.Add(new GradientStop(color3, 1));
+                border.Background = gradientBrush;
+
+                var gradientEffect = new DropShadowEffect
+                {
+                    ShadowDepth = 5,
+                    BlurRadius = 20,
+                    Opacity = darkMode ? 0.7 : 0.5,
+                    Color = darkMode
+                        ? System.Windows.Media.Color.FromRgb(0, 0, 0)
+                        : System.Windows.Media.Color.FromRgb(99, 102, 241)
+                };
+                border.Effect = gradientEffect;
+                _logger.LogDebug("Applied Gradient style (DarkMode: {DarkMode})", darkMode);
+                break;
+
+            case AppStyle.Neumorphism:
+                // Neumorphism (Soft UI) with subtle shadows
+                var neumoBackground = new SolidColorBrush(darkMode
+                    ? System.Windows.Media.Color.FromRgb(35, 35, 42)
+                    : System.Windows.Media.Color.FromRgb(230, 230, 235));
+                border.Background = neumoBackground;
+
+                // Create layered shadow effect for depth
+                var neumoEffect = new DropShadowEffect
+                {
+                    ShadowDepth = 8,
+                    BlurRadius = 16,
+                    Opacity = darkMode ? 0.4 : 0.25,
+                    Color = darkMode
+                        ? System.Windows.Media.Color.FromRgb(10, 10, 15)
+                        : System.Windows.Media.Color.FromRgb(180, 180, 190),
+                    Direction = 135
+                };
+                border.Effect = neumoEffect;
+                _logger.LogDebug("Applied Neumorphism style (DarkMode: {DarkMode})", darkMode);
                 break;
         }
     }
@@ -350,6 +488,7 @@ public partial class MainWindow
 
     private System.Windows.Controls.Primitives.Popup? _currentOpenPopup;
     private DispatcherTimer? _popupCloseTimer;
+    private DispatcherTimer? _popupSafetyTimer;
 
     private void ProjectButton_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
     {
@@ -358,6 +497,12 @@ public partial class MainWindow
 
         if (sender is System.Windows.Controls.Button button && button.DataContext is Models.Project project)
         {
+            // Close any currently open popup first (like a menu system)
+            if (_currentOpenPopup != null && _currentOpenPopup.IsOpen)
+            {
+                _currentOpenPopup.IsOpen = false;
+            }
+
             // Find the popup in the visual tree
             var grid = button.Parent as System.Windows.Controls.Grid;
             if (grid != null)
@@ -374,6 +519,16 @@ public partial class MainWindow
 
     private void ProjectButton_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
     {
+        // Only close if mouse is moving right (out of sidebar), not down within sidebar
+        var mousePosition = System.Windows.Input.Mouse.GetPosition(this);
+        var sidebarWidth = Width;
+
+        // If mouse is still within sidebar width, don't close
+        if (mousePosition.X <= sidebarWidth)
+        {
+            return;
+        }
+
         // Start a timer to close the popup if mouse doesn't enter it
         _popupCloseTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
         _popupCloseTimer.Tick += (s, args) =>
@@ -401,6 +556,30 @@ public partial class MainWindow
         {
             _currentOpenPopup.IsOpen = false;
             _currentOpenPopup = null;
+        }
+    }
+
+    private void PopupSafetyTimer_Tick(object? sender, EventArgs e)
+    {
+        // Safety check: close popup if neither button nor popup is hovered
+        if (_currentOpenPopup != null && _currentOpenPopup.IsOpen)
+        {
+            var popupHovered = _currentOpenPopup.IsMouseOver;
+            var buttonHovered = false;
+
+            // Check if the associated button is still hovered
+            if (_currentOpenPopup.PlacementTarget is System.Windows.Controls.Button button)
+            {
+                buttonHovered = button.IsMouseOver;
+            }
+
+            // If neither is hovered, close the popup
+            if (!popupHovered && !buttonHovered)
+            {
+                _currentOpenPopup.IsOpen = false;
+                _currentOpenPopup = null;
+                _logger.LogDebug("Safety timer closed orphaned popup");
+            }
         }
     }
 
@@ -435,5 +614,75 @@ public partial class MainWindow
                 e.Handled = true;
             }
         }
+    }
+
+    private void ReserveScreenSpace()
+    {
+        var workArea = new Rect();
+        if (SystemParametersInfo(SpiGetworkarea, 0, ref workArea, 0))
+        {
+            // Reserve space on the left for sidebar
+            var sidebarWidth = (int)Width;
+            workArea.Left = sidebarWidth;
+
+            if (SystemParametersInfo(SpiSetworkarea, 0, ref workArea, SpifUpdateinifile | SpifSendchange))
+            {
+                _logger.LogInformation("Reserved {Width}px screen space for sidebar", sidebarWidth);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to reserve screen space for sidebar");
+            }
+        }
+    }
+
+    private void RestoreScreenSpace()
+    {
+        var workArea = new Rect();
+        if (SystemParametersInfo(SpiGetworkarea, 0, ref workArea, 0))
+        {
+            // Restore original work area (remove left reservation)
+            workArea.Left = 0;
+
+            if (SystemParametersInfo(SpiSetworkarea, 0, ref workArea, SpifUpdateinifile | SpifSendchange))
+            {
+                _logger.LogInformation("Restored screen space");
+            }
+        }
+    }
+
+    private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+    {
+        // Restore screen space when closing
+        RestoreScreenSpace();
+    }
+
+    private System.Windows.Media.Color ParseRgbColor(string rgb, bool darkMode)
+    {
+        try
+        {
+            var parts = rgb.Split(',');
+            if (parts.Length == 3 &&
+                byte.TryParse(parts[0].Trim(), out byte r) &&
+                byte.TryParse(parts[1].Trim(), out byte g) &&
+                byte.TryParse(parts[2].Trim(), out byte b))
+            {
+                // Apply darkening if dark mode
+                if (darkMode)
+                {
+                    r = (byte)(r * 0.7);
+                    g = (byte)(g * 0.7);
+                    b = (byte)(b * 0.7);
+                }
+                return System.Windows.Media.Color.FromRgb(r, g, b);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to parse RGB color: {Rgb}", rgb);
+        }
+
+        // Fallback to indigo
+        return System.Windows.Media.Color.FromRgb(99, 102, 241);
     }
 }

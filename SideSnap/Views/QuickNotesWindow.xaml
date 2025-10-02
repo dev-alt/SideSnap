@@ -1,0 +1,133 @@
+<Window x:Class="SideSnap.Views.QuickNotesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Quick Notes"
+        Height="500"
+        Width="400"
+        WindowStartupLocation="CenterScreen"
+        Background="#ECF0F1">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#2C3E50" Padding="15">
+            <StackPanel>
+                <TextBlock Text="📝 Quick Notes"
+                          Foreground="White"
+                          FontSize="18"
+                          FontWeight="Bold"/>
+                <TextBlock Text="Scratchpad for quick thoughts and reminders"
+                          Foreground="#BDC3C7"
+                          FontSize="11"
+                          Margin="0,3,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Notes List -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="10">
+            <ItemsControl x:Name="NotesItemsControl">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="White"
+                               Margin="0,0,0,10"
+                               CornerRadius="8"
+                               BorderBrush="#BDC3C7"
+                               BorderThickness="1"
+                               Padding="12">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Note Header -->
+                                <Grid Grid.Row="0" Margin="0,0,0,8">
+                                    <TextBlock Text="{Binding CreatedAt, StringFormat='Created: {0:g}'}"
+                                              FontSize="10"
+                                              Foreground="#7F8C8D"
+                                              HorizontalAlignment="Left"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Content="📌"
+                                               Width="24"
+                                               Height="24"
+                                               Margin="0,0,5,0"
+                                               Background="Transparent"
+                                               BorderThickness="0"
+                                               Cursor="Hand"
+                                               ToolTip="Pin note"
+                                               Click="PinNote_Click"
+                                               Tag="{Binding}"/>
+                                        <Button Content="🗑️"
+                                               Width="24"
+                                               Height="24"
+                                               Background="Transparent"
+                                               BorderThickness="0"
+                                               Cursor="Hand"
+                                               ToolTip="Delete note"
+                                               Click="DeleteNote_Click"
+                                               Tag="{Binding}"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Note Content -->
+                                <TextBox Grid.Row="1"
+                                        Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}"
+                                        TextWrapping="Wrap"
+                                        AcceptsReturn="True"
+                                        BorderThickness="0"
+                                        MinHeight="60"
+                                        MaxHeight="200"
+                                        VerticalScrollBarVisibility="Auto"
+                                        FontSize="12"
+                                        TextChanged="NoteContent_TextChanged"
+                                        Tag="{Binding}"/>
+
+                                <!-- Modified Time -->
+                                <TextBlock Grid.Row="2"
+                                          Text="{Binding ModifiedAt, StringFormat='Modified: {0:g}'}"
+                                          FontSize="9"
+                                          Foreground="#95A5A6"
+                                          Margin="0,5,0,0"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="White" Padding="10" BorderBrush="#BDC3C7" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="➕ New Note"
+                       Click="AddNote_Click"
+                       Width="120"
+                       Height="35"
+                       Margin="0,0,10,0"
+                       Background="#27AE60"
+                       Foreground="White"
+                       BorderThickness="0"
+                       FontWeight="Bold"
+                       Cursor="Hand"
+                       Style="{StaticResource ModernButton}"/>
+                <Button Content="Close"
+                       Click="Close_Click"
+                       Width="80"
+                       Height="35"
+                       Background="#95A5A6"
+                       Foreground="White"
+                       BorderThickness="0"
+                       Cursor="Hand"
+                       Style="{StaticResource ModernButton}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
