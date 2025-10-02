@@ -3,10 +3,13 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using System.Windows.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SideSnap.Models;
 using SideSnap.Services;
 using SideSnap.ViewModels;
 
@@ -58,6 +61,9 @@ public partial class MainWindow
         // Load auto-hide setting
         var settings = _settingsService.LoadSettings();
         _isAutoHideEnabled = settings.AutoHide;
+
+        // Apply visual style
+        ApplyVisualStyle(settings.Style);
 
         // Setup auto-hide timer
         _hideTimer = new DispatcherTimer
@@ -195,12 +201,62 @@ public partial class MainWindow
             // Reload settings
             var settings = _settingsService.LoadSettings();
             _isAutoHideEnabled = settings.AutoHide;
-            _logger.LogInformation("Settings updated - Auto-hide: {AutoHide}", _isAutoHideEnabled);
+            ApplyVisualStyle(settings.Style);
+            _logger.LogInformation("Settings updated - Auto-hide: {AutoHide}, Style: {Style}", _isAutoHideEnabled, settings.Style);
 
             if (!_isAutoHideEnabled && !_isExpanded)
             {
                 ExpandSidebar();
             }
+        }
+    }
+
+    private void ApplyVisualStyle(AppStyle style)
+    {
+        var border = this.FindName("MainBorder") as System.Windows.Controls.Border;
+        if (border == null) return;
+
+        switch (style)
+        {
+            case AppStyle.Solid:
+                border.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(240, 240, 240));
+                border.Effect = new DropShadowEffect { ShadowDepth = 2, BlurRadius = 10, Opacity = 0.3 };
+                _logger.LogDebug("Applied Solid style");
+                break;
+
+            case AppStyle.Glass:
+                // Glass effect with blur
+                var glassBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(230, 240, 240, 240));
+                border.Background = glassBrush;
+                border.Effect = new BlurEffect { Radius = 0 };
+
+                // Add inner glow for glass effect
+                var glassEffect = new DropShadowEffect
+                {
+                    ShadowDepth = 0,
+                    BlurRadius = 15,
+                    Opacity = 0.4,
+                    Color = Colors.White
+                };
+                border.Effect = glassEffect;
+                _logger.LogDebug("Applied Glass style");
+                break;
+
+            case AppStyle.Acrylic:
+                // Acrylic effect with transparency
+                var acrylicBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(200, 245, 245, 245));
+                border.Background = acrylicBrush;
+
+                var acrylicEffect = new DropShadowEffect
+                {
+                    ShadowDepth = 2,
+                    BlurRadius = 20,
+                    Opacity = 0.5,
+                    Color = System.Windows.Media.Color.FromRgb(100, 100, 100)
+                };
+                border.Effect = acrylicEffect;
+                _logger.LogDebug("Applied Acrylic style");
+                break;
         }
     }
 

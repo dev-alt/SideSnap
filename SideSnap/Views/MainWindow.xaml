@@ -25,7 +25,8 @@
         DragOver="Window_DragOver"
         x:Name="RootWindow">
 
-    <Border Background="#F0F0F0"
+    <Border x:Name="MainBorder"
+            Background="#F0F0F0"
             BorderBrush="#CCCCCC"
             BorderThickness="0,0,1,0"
             CornerRadius="0,8,8,0">

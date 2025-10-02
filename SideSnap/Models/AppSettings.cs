@@ -7,4 +7,12 @@ public class AppSettings
     public bool StartWithWindows { get; set; } = false;
     public bool DarkMode { get; set; } = false;
     public double Opacity { get; set; } = 0.95;
+    public AppStyle Style { get; set; } = AppStyle.Solid;
+}
+
+public enum AppStyle
+{
+    Solid,
+    Glass,
+    Acrylic
 }
