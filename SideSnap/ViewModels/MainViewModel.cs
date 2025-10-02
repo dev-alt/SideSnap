@@ -372,11 +372,14 @@ public partial class MainViewModel : ViewModelBase
     public void AddDroppedExecutable(string path)
     {
         var name = Path.GetFileNameWithoutExtension(path);
+        var settings = _settingsService.LoadSettings();
+
         var command = new PowerShellCommand
         {
             Name = name,
             Command = $"Start-Process '{path}'",
             RunHidden = false,
+            ShowLabel = settings.ShowLabelByDefault,
             ScriptType = ScriptType.Executable
         };
 
