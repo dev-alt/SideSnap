@@ -28,6 +28,9 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private bool _showLabelByDefault;
 
+    [ObservableProperty]
+    private bool _isLocked;
+
     public SettingsViewModel(ISettingsService settingsService, ILogger<SettingsViewModel> logger)
     {
         _settingsService = settingsService;
@@ -45,12 +48,16 @@ public partial class SettingsViewModel : ViewModelBase
         Opacity = settings.Opacity;
         StyleIndex = (int)settings.Style;
         ShowLabelByDefault = settings.ShowLabelByDefault;
+        IsLocked = settings.IsLocked;
 
         _logger.LogDebug("Settings loaded");
     }
 
     public void SaveSettings()
     {
+        // Load current settings to preserve width/height
+        var currentSettings = _settingsService.LoadSettings();
+
         var settings = new AppSettings
         {
             AutoHide = AutoHide,
@@ -59,7 +66,9 @@ public partial class SettingsViewModel : ViewModelBase
             Opacity = Opacity,
             Style = (AppStyle)StyleIndex,
             ShowLabelByDefault = ShowLabelByDefault,
-            SidebarWidth = 105
+            IsLocked = IsLocked,
+            SidebarWidth = currentSettings.SidebarWidth,
+            SidebarHeight = currentSettings.SidebarHeight
         };
 
         _settingsService.SaveSettings(settings);

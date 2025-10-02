@@ -141,6 +141,28 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Lock/Unlock Position -->
+                <Border Background="White"
+                        Padding="15"
+                        Margin="0,0,0,10"
+                        CornerRadius="8"
+                        BorderBrush="#BDC3C7"
+                        BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Position &amp; Size"
+                                  FontWeight="Bold"
+                                  FontSize="14"
+                                  Margin="0,0,0,5"/>
+                        <TextBlock Text="Lock sidebar position and size, or unlock to customize"
+                                  Foreground="#7F8C8D"
+                                  FontSize="11"
+                                  TextWrapping="Wrap"
+                                  Margin="0,0,0,8"/>
+                        <CheckBox Content="Lock position and size"
+                                 IsChecked="{Binding IsLocked}"/>
+                    </StackPanel>
+                </Border>
+
                 <!-- Opacity Setting -->
                 <Border Background="White"
                         Padding="15"

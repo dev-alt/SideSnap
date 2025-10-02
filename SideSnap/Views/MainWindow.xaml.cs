@@ -58,9 +58,23 @@ public partial class MainWindow
 
         _logger.LogDebug("Window positioned at (0,0) with width {Width}px and height {Height}px", Width, Height);
 
-        // Load auto-hide setting
+        // Load settings
         var settings = _settingsService.LoadSettings();
         _isAutoHideEnabled = settings.AutoHide;
+
+        // Apply lock/unlock state
+        if (settings.IsLocked)
+        {
+            ResizeMode = ResizeMode.NoResize;
+        }
+        else
+        {
+            ResizeMode = ResizeMode.CanResizeWithGrip;
+            if (settings.SidebarWidth > 0)
+                Width = settings.SidebarWidth;
+            if (settings.SidebarHeight > 0)
+                Height = settings.SidebarHeight;
+        }
 
         // Apply visual style
         ApplyVisualStyle(settings.Style);
@@ -194,6 +208,16 @@ public partial class MainWindow
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
         _logger.LogInformation("Opening settings window");
+
+        // Save current size before opening settings
+        var currentSettings = _settingsService.LoadSettings();
+        if (!currentSettings.IsLocked)
+        {
+            currentSettings.SidebarWidth = Width;
+            currentSettings.SidebarHeight = Height;
+            _settingsService.SaveSettings(currentSettings);
+        }
+
         var settingsWindow = _serviceProvider.GetRequiredService<SettingsWindow>();
         settingsWindow.Owner = this;
         if (settingsWindow.ShowDialog() == true)
@@ -202,7 +226,19 @@ public partial class MainWindow
             var settings = _settingsService.LoadSettings();
             _isAutoHideEnabled = settings.AutoHide;
             ApplyVisualStyle(settings.Style);
-            _logger.LogInformation("Settings updated - Auto-hide: {AutoHide}, Style: {Style}", _isAutoHideEnabled, settings.Style);
+
+            // Apply lock/unlock state
+            if (settings.IsLocked)
+            {
+                ResizeMode = ResizeMode.NoResize;
+            }
+            else
+            {
+                ResizeMode = ResizeMode.CanResizeWithGrip;
+            }
+
+            _logger.LogInformation("Settings updated - Auto-hide: {AutoHide}, Style: {Style}, Locked: {Locked}",
+                _isAutoHideEnabled, settings.Style, settings.IsLocked);
 
             if (!_isAutoHideEnabled && !_isExpanded)
             {
