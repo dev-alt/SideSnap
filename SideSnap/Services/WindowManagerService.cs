@@ -218,4 +218,184 @@ public partial class WindowManagerService : IWindowManagerService
             _ = SetWindowPos(hwnd, IntPtr.Zero, x, y, 0, 0, SwpNoSize | SwpNoZOrder | SwpShowWindow);
         }
     }
+
+    // Layout system methods
+    public List<CapturedWindow> GetOpenWindows()
+    {
+        var windows = new List<CapturedWindow>();
+
+        _ = EnumWindows((hWnd, _) =>
+        {
+            if (!IsWindowVisible(hWnd))
+                return true;
+
+            GetWindowThreadProcessId(hWnd, out uint processId);
+            try
+            {
+                var process = Process.GetProcessById((int)processId);
+                if (GetWindowRect(hWnd, out Rect rect))
+                {
+                    var title = GetWindowTitle(hWnd);
+
+                    // Skip windows without titles (likely background windows)
+                    if (string.IsNullOrWhiteSpace(title))
+                        return true;
+
+                    windows.Add(new CapturedWindow
+                    {
+                        Handle = hWnd,
+                        ProcessName = process.ProcessName,
+                        WindowTitle = title,
+                        ApplicationPath = process.MainModule?.FileName ?? string.Empty,
+                        MonitorIndex = GetMonitorIndex(hWnd),
+                        X = rect.Left,
+                        Y = rect.Top,
+                        Width = rect.Width,
+                        Height = rect.Height,
+                        State = Models.WindowState.Normal // TODO: Detect actual state
+                    });
+                }
+            }
+            catch
+            {
+                // Process may have exited
+            }
+
+            return true;
+        }, IntPtr.Zero);
+
+        return windows;
+    }
+
+    public bool LaunchApplication(string path, string arguments = "")
+    {
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = path,
+                Arguments = arguments,
+                UseShellExecute = true
+            };
+            Process.Start(startInfo);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public bool MoveWindow(IntPtr hwnd, WindowPosition position)
+    {
+        if (hwnd == IntPtr.Zero)
+            return false;
+
+        return SetWindowPos(hwnd, IntPtr.Zero, position.X, position.Y,
+            position.Width, position.Height, SwpNoZOrder | SwpShowWindow);
+    }
+
+    public List<IntPtr> FindWindowsByProcess(string processName, string? windowTitle = null)
+    {
+        var windows = new List<IntPtr>();
+
+        _ = EnumWindows((hWnd, _) =>
+        {
+            if (!IsWindowVisible(hWnd))
+                return true;
+
+            GetWindowThreadProcessId(hWnd, out uint processId);
+            try
+            {
+                var process = Process.GetProcessById((int)processId);
+                if (process.ProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (windowTitle == null)
+                    {
+                        windows.Add(hWnd);
+                    }
+                    else
+                    {
+                        var title = GetWindowTitle(hWnd);
+                        if (title.Contains(windowTitle, StringComparison.OrdinalIgnoreCase))
+                        {
+                            windows.Add(hWnd);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Process may have exited
+            }
+
+            return true;
+        }, IntPtr.Zero);
+
+        return windows;
+    }
+
+    public void ApplyLayout(WindowLayout layout)
+    {
+        foreach (var windowPos in layout.Windows)
+        {
+            var handles = FindWindowsByProcess(windowPos.ProcessName, windowPos.WindowTitle);
+
+            if (handles.Count == 0 && layout.LaunchBehavior != LaunchBehavior.OnlyPosition)
+            {
+                // Launch the application
+                if (LaunchApplication(windowPos.ApplicationPath, windowPos.Arguments))
+                {
+                    // Wait a bit for the window to appear
+                    System.Threading.Thread.Sleep(1000);
+                    handles = FindWindowsByProcess(windowPos.ProcessName, windowPos.WindowTitle);
+                }
+            }
+
+            // Move all found windows (or just launched one)
+            foreach (var hwnd in handles)
+            {
+                MoveWindow(hwnd, windowPos);
+            }
+        }
+    }
+
+    public WindowPosition? GetWindowPosition(IntPtr hwnd)
+    {
+        if (hwnd == IntPtr.Zero || !GetWindowRect(hwnd, out Rect rect))
+            return null;
+
+        GetWindowThreadProcessId(hwnd, out uint processId);
+        try
+        {
+            var process = Process.GetProcessById((int)processId);
+            return new WindowPosition
+            {
+                ProcessName = process.ProcessName,
+                WindowTitle = GetWindowTitle(hwnd),
+                ApplicationPath = process.MainModule?.FileName ?? string.Empty,
+                X = rect.Left,
+                Y = rect.Top,
+                Width = rect.Width,
+                Height = rect.Height,
+                MonitorIndex = GetMonitorIndex(hwnd),
+                State = Models.WindowState.Normal // TODO: Detect actual state
+            };
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetWindowText(IntPtr hWnd, char[] lpString, int nMaxCount);
+
+    private static string GetWindowTitle(IntPtr hWnd)
+    {
+        const int maxLength = 256;
+        var title = new char[maxLength];
+        int length = GetWindowText(hWnd, title, maxLength);
+        return length > 0 ? new string(title, 0, length) : string.Empty;
+    }
 }

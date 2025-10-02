@@ -69,6 +69,7 @@ public partial class App
         services.AddSingleton<IIconService, IconService>();
         services.AddSingleton<ITodoService, TodoService>();
         services.AddSingleton<IProjectService, ProjectService>();
+        services.AddSingleton<ILayoutService, LayoutService>();
 
         // ViewModels
         services.AddSingleton<MainViewModel>();
