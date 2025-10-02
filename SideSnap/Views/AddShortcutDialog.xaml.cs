@@ -1,10 +1,13 @@
 using System.IO;
 using System.Windows;
+using SideSnap.Services;
 
 namespace SideSnap.Views;
 
 public partial class AddShortcutDialog
 {
+    private readonly ISettingsService _settingsService;
+
     public string ShortcutName { get; private set; } = string.Empty;
     public string ShortcutPath { get; private set; } = string.Empty;
     public string CustomIconPath { get; private set; } = string.Empty;
@@ -14,10 +17,15 @@ public partial class AddShortcutDialog
     public string HeaderText { get; set; } = "Add New Shortcut";
     public string PrimaryButtonText { get; set; } = "Add";
 
-    public AddShortcutDialog()
+    public AddShortcutDialog(ISettingsService settingsService)
     {
+        _settingsService = settingsService;
         InitializeComponent();
         DataContext = this; // allow simple bindings to dialog properties
+
+        // Set default from settings
+        var settings = _settingsService.LoadSettings();
+        ShowLabelCheckBox.IsChecked = settings.ShowLabelByDefault;
     }
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)

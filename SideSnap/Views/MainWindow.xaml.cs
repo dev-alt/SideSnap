@@ -351,4 +351,37 @@ public partial class MainWindow
         };
         timer.Start();
     }
+
+    private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        // F2 to rename focused item
+        if (e.Key == System.Windows.Input.Key.F2)
+        {
+            var viewModel = DataContext as MainViewModel;
+            if (viewModel == null) return;
+
+            // Get the focused element
+            var focusedElement = System.Windows.Input.Keyboard.FocusedElement as FrameworkElement;
+            if (focusedElement == null) return;
+
+            // Find the data context of the focused element
+            var dataContext = focusedElement.DataContext;
+
+            if (dataContext is FolderShortcut shortcut)
+            {
+                viewModel.EditShortcutCommand.Execute(shortcut);
+                e.Handled = true;
+            }
+            else if (dataContext is PowerShellCommand command)
+            {
+                viewModel.EditCommandCommand.Execute(command);
+                e.Handled = true;
+            }
+            else if (dataContext is Project project)
+            {
+                viewModel.EditProjectCommand.Execute(project);
+                e.Handled = true;
+            }
+        }
+    }
 }

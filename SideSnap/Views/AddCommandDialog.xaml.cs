@@ -1,9 +1,12 @@
 using System.Windows;
+using SideSnap.Services;
 
 namespace SideSnap.Views;
 
 public partial class AddCommandDialog
 {
+    private readonly ISettingsService _settingsService;
+
     public string CommandName { get; private set; } = string.Empty;
     public string CommandText { get; private set; } = string.Empty;
     public string CustomIconPath { get; private set; } = string.Empty;
@@ -12,9 +15,14 @@ public partial class AddCommandDialog
     public bool IsFavorite { get; private set; }
     public bool ShowLabel { get; private set; } = true;
 
-    public AddCommandDialog()
+    public AddCommandDialog(ISettingsService settingsService)
     {
+        _settingsService = settingsService;
         InitializeComponent();
+
+        // Set default from settings
+        var settings = _settingsService.LoadSettings();
+        ShowLabelCheckBox.IsChecked = settings.ShowLabelByDefault;
     }
 
     private void BrowseIconButton_Click(object sender, RoutedEventArgs e)

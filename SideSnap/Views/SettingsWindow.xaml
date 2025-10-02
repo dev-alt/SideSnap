@@ -119,6 +119,28 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Show Label By Default -->
+                <Border Background="White"
+                        Padding="15"
+                        Margin="0,0,0,10"
+                        CornerRadius="8"
+                        BorderBrush="#BDC3C7"
+                        BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Labels"
+                                  FontWeight="Bold"
+                                  FontSize="14"
+                                  Margin="0,0,0,5"/>
+                        <TextBlock Text="Show labels on new folders, scripts, and commands by default"
+                                  Foreground="#7F8C8D"
+                                  FontSize="11"
+                                  TextWrapping="Wrap"
+                                  Margin="0,0,0,8"/>
+                        <CheckBox Content="Show labels by default"
+                                 IsChecked="{Binding ShowLabelByDefault}"/>
+                    </StackPanel>
+                </Border>
+
                 <!-- Opacity Setting -->
                 <Border Background="White"
                         Padding="15"

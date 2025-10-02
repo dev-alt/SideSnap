@@ -8,6 +8,7 @@ public class AppSettings
     public bool DarkMode { get; set; } = false;
     public double Opacity { get; set; } = 0.95;
     public AppStyle Style { get; set; } = AppStyle.Solid;
+    public bool ShowLabelByDefault { get; set; } = true;
 }
 
 public enum AppStyle

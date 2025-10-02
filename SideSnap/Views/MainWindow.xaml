@@ -23,6 +23,7 @@
         AllowDrop="True"
         Drop="Window_Drop"
         DragOver="Window_DragOver"
+        KeyDown="Window_KeyDown"
         x:Name="RootWindow">
 
     <Border x:Name="MainBorder"
@@ -103,6 +104,7 @@
                                        CommandParameter="{Binding}"
                                        Margin="5,3"
                                        HorizontalAlignment="Stretch"
+                                       Focusable="True"
                                        Style="{StaticResource SidebarButton}">
                                     <Button.ToolTip>
                                         <ToolTip>
@@ -173,6 +175,7 @@
                                            CommandParameter="{Binding}"
                                            Margin="5,3"
                                            HorizontalAlignment="Stretch"
+                                           Focusable="True"
                                            Style="{StaticResource SidebarButton}"
                                            MouseEnter="ProjectButton_MouseEnter"
                                            MouseLeave="ProjectButton_MouseLeave">
@@ -307,6 +310,7 @@
                                        CommandParameter="{Binding}"
                                        Margin="5,3"
                                        HorizontalAlignment="Stretch"
+                                       Focusable="True"
                                        Style="{StaticResource SidebarButton}">
                                     <Button.ToolTip>
                                         <ToolTip>

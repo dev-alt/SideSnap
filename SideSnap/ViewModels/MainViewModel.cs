@@ -103,9 +103,18 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void RemoveShortcut(FolderShortcut shortcut)
     {
-        Shortcuts.Remove(shortcut);
-        SaveShortcuts();
-        _logger.LogInformation("Removed shortcut: {Name}", shortcut.Name);
+        var result = System.Windows.MessageBox.Show(
+            $"Are you sure you want to delete the shortcut '{shortcut.Name}'?",
+            "Confirm Delete",
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Question);
+
+        if (result == System.Windows.MessageBoxResult.Yes)
+        {
+            Shortcuts.Remove(shortcut);
+            SaveShortcuts();
+            _logger.LogInformation("Removed shortcut: {Name}", shortcut.Name);
+        }
     }
 
     [RelayCommand]
@@ -176,9 +185,18 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void RemoveCommand(PowerShellCommand command)
     {
-        Commands.Remove(command);
-        _commandExecutor.SaveCommands(Commands);
-        _logger.LogInformation("Removed command: {Name}", command.Name);
+        var result = System.Windows.MessageBox.Show(
+            $"Are you sure you want to delete the command '{command.Name}'?",
+            "Confirm Delete",
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Question);
+
+        if (result == System.Windows.MessageBoxResult.Yes)
+        {
+            Commands.Remove(command);
+            _commandExecutor.SaveCommands(Commands);
+            _logger.LogInformation("Removed command: {Name}", command.Name);
+        }
     }
 
     [RelayCommand]
@@ -386,6 +404,7 @@ public partial class MainViewModel : ViewModelBase
     public void AddDroppedShellScript(string path)
     {
         var name = Path.GetFileNameWithoutExtension(path);
+        var settings = _settingsService.LoadSettings();
 
         // Convert Windows path to WSL path (e.g., C:\Users\... to /mnt/c/Users/...)
         var wslPath = ConvertToWslPath(path);
@@ -395,7 +414,7 @@ public partial class MainViewModel : ViewModelBase
             Name = name,
             Command = $"wsl bash \"{wslPath}\"",
             RunHidden = false,
-            ShowLabel = true,
+            ShowLabel = settings.ShowLabelByDefault,
             ScriptType = ScriptType.Bash
         };
 
@@ -407,13 +426,14 @@ public partial class MainViewModel : ViewModelBase
     public void AddDroppedPowerShellScript(string path)
     {
         var name = Path.GetFileNameWithoutExtension(path);
+        var settings = _settingsService.LoadSettings();
 
         var command = new PowerShellCommand
         {
             Name = name,
             Command = $"& '{path}'",
             RunHidden = false,
-            ShowLabel = true,
+            ShowLabel = settings.ShowLabelByDefault,
             ScriptType = ScriptType.PowerShell
         };
 
@@ -521,9 +541,19 @@ public partial class MainViewModel : ViewModelBase
     private void RemoveProject(Project? project)
     {
         if (project == null) return;
-        Projects.Remove(project);
-        SaveProjects();
-        _logger.LogInformation("Removed project: {Name}", project.Name);
+
+        var result = System.Windows.MessageBox.Show(
+            $"Are you sure you want to delete the project '{project.Name}' and all its items?",
+            "Confirm Delete",
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Question);
+
+        if (result == System.Windows.MessageBoxResult.Yes)
+        {
+            Projects.Remove(project);
+            SaveProjects();
+            _logger.LogInformation("Removed project: {Name}", project.Name);
+        }
     }
 
     [RelayCommand]

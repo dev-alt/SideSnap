@@ -25,6 +25,9 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private int _styleIndex;
 
+    [ObservableProperty]
+    private bool _showLabelByDefault;
+
     public SettingsViewModel(ISettingsService settingsService, ILogger<SettingsViewModel> logger)
     {
         _settingsService = settingsService;
@@ -41,6 +44,7 @@ public partial class SettingsViewModel : ViewModelBase
         DarkMode = settings.DarkMode;
         Opacity = settings.Opacity;
         StyleIndex = (int)settings.Style;
+        ShowLabelByDefault = settings.ShowLabelByDefault;
 
         _logger.LogDebug("Settings loaded");
     }
@@ -54,6 +58,7 @@ public partial class SettingsViewModel : ViewModelBase
             DarkMode = DarkMode,
             Opacity = Opacity,
             Style = (AppStyle)StyleIndex,
+            ShowLabelByDefault = ShowLabelByDefault,
             SidebarWidth = 105
         };
 
