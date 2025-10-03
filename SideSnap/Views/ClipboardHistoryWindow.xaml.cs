@@ -71,14 +71,14 @@ public partial class ClipboardHistoryWindow : Window
             {
                 if (item.Type == ClipboardItemType.Text)
                 {
-                    Clipboard.SetText(item.Content);
+                    System.Windows.Clipboard.SetText(item.Content);
                 }
                 else if (item.Type == ClipboardItemType.File)
                 {
                     var files = item.Content.Split(", ");
                     var fileCollection = new System.Collections.Specialized.StringCollection();
                     fileCollection.AddRange(files);
-                    Clipboard.SetFileDropList(fileCollection);
+                    System.Windows.Clipboard.SetFileDropList(fileCollection);
                 }
 
                 _logger.LogInformation("Copied item to clipboard");
@@ -86,7 +86,7 @@ public partial class ClipboardHistoryWindow : Window
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to copy item to clipboard");
-                MessageBox.Show("Failed to copy to clipboard", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show("Failed to copy to clipboard", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
@@ -106,7 +106,7 @@ public partial class ClipboardHistoryWindow : Window
     {
         if (sender is System.Windows.Controls.Button button && button.Tag is ClipboardItem item)
         {
-            var result = MessageBox.Show("Delete this clipboard item?", "Confirm Delete",
+            var result = System.Windows.MessageBox.Show("Delete this clipboard item?", "Confirm Delete",
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
@@ -119,7 +119,7 @@ public partial class ClipboardHistoryWindow : Window
 
     private void ClearAll_Click(object sender, RoutedEventArgs e)
     {
-        var result = MessageBox.Show(
+        var result = System.Windows.MessageBox.Show(
             "Clear all clipboard history? Pinned items will be kept.",
             "Confirm Clear",
             MessageBoxButton.YesNo,

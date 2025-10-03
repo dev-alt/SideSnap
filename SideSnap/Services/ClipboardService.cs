@@ -84,9 +84,9 @@ public partial class ClipboardService : IClipboardService
     {
         try
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                var mainWindow = Application.Current.MainWindow;
+                var mainWindow = System.Windows.Application.Current.MainWindow;
                 if (mainWindow != null)
                 {
                     var helper = new WindowInteropHelper(mainWindow);
@@ -112,7 +112,7 @@ public partial class ClipboardService : IClipboardService
         {
             if (_hwndSource != null)
             {
-                var mainWindow = Application.Current.MainWindow;
+                var mainWindow = System.Windows.Application.Current.MainWindow;
                 if (mainWindow != null)
                 {
                     var helper = new WindowInteropHelper(mainWindow);
@@ -141,11 +141,11 @@ public partial class ClipboardService : IClipboardService
     {
         try
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (Clipboard.ContainsText())
+                if (System.Windows.Clipboard.ContainsText())
                 {
-                    var text = Clipboard.GetText();
+                    var text = System.Windows.Clipboard.GetText();
 
                     // Avoid duplicates
                     if (text == _lastClipboardText || string.IsNullOrWhiteSpace(text))
@@ -165,9 +165,9 @@ public partial class ClipboardService : IClipboardService
                     ClipboardChanged?.Invoke(this, item);
                     _logger.LogDebug("Clipboard changed: {Preview}", item.Content.Substring(0, Math.Min(50, item.Content.Length)));
                 }
-                else if (Clipboard.ContainsFileDropList())
+                else if (System.Windows.Clipboard.ContainsFileDropList())
                 {
-                    var files = Clipboard.GetFileDropList();
+                    var files = System.Windows.Clipboard.GetFileDropList();
                     if (files.Count > 0)
                     {
                         var fileList = string.Join(", ", files.Cast<string>());

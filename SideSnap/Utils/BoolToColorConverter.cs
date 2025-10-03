@@ -10,9 +10,9 @@ public class BoolToColorConverter : IValueConverter
     {
         if (value is bool isEnabled)
         {
-            return new SolidColorBrush(isEnabled ? Color.FromRgb(39, 174, 96) : Color.FromRgb(192, 57, 43));
+            return new SolidColorBrush(isEnabled ? System.Windows.Media.Color.FromRgb(39, 174, 96) : System.Windows.Media.Color.FromRgb(192, 57, 43));
         }
-        return new SolidColorBrush(Color.FromRgb(192, 57, 43));
+        return new SolidColorBrush(System.Windows.Media.Color.FromRgb(192, 57, 43));
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

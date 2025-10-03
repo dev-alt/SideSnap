@@ -18,7 +18,7 @@ public class RgbToColorConverter : IValueConverter
                     byte.TryParse(parts[1].Trim(), out byte g) &&
                     byte.TryParse(parts[2].Trim(), out byte b))
                 {
-                    return Color.FromRgb(r, g, b);
+                    return System.Windows.Media.Color.FromRgb(r, g, b);
                 }
             }
             catch
@@ -27,12 +27,12 @@ public class RgbToColorConverter : IValueConverter
             }
         }
 
-        return Color.FromRgb(99, 102, 241); // Default indigo
+        return System.Windows.Media.Color.FromRgb(99, 102, 241); // Default indigo
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is Color color)
+        if (value is System.Windows.Media.Color color)
         {
             return $"{color.R},{color.G},{color.B}";
         }

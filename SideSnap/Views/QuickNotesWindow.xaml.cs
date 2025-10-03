@@ -40,7 +40,7 @@ public partial class QuickNotesWindow : Window
     {
         if (sender is System.Windows.Controls.Button button && button.Tag is QuickNote note)
         {
-            var result = MessageBox.Show("Delete this note?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var result = System.Windows.MessageBox.Show("Delete this note?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
                 _notes.Remove(note);
