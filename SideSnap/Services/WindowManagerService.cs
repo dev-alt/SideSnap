@@ -37,6 +37,25 @@ public partial class WindowManagerService : IWindowManagerService
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, IntPtr dwData);
 
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool IsIconic(IntPtr hWnd);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool IsZoomed(IntPtr hWnd);
+
+    [LibraryImport("user32.dll", EntryPoint = "ShowWindow")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool ShowWindowNative(IntPtr hWnd, int nCmdShow);
+
+    [LibraryImport("user32.dll", EntryPoint = "CloseWindow")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool MinimizeWindowNative(IntPtr hWnd);
+
+    [LibraryImport("user32.dll")]
+    private static partial IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
     private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
     private delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref Rect lprcMonitor, IntPtr dwData);
 
@@ -44,6 +63,18 @@ public partial class WindowManagerService : IWindowManagerService
     private const uint SwpNoSize = 0x0001;
     private const uint SwpNoZOrder = 0x0004;
     private const uint SwpShowWindow = 0x0040;
+
+    // ShowWindow constants
+    private const int SwHide = 0;
+    private const int SwNormal = 1;
+    private const int SwShowMinimized = 2;
+    private const int SwMaximize = 3;
+    private const int SwShowNoActivate = 4;
+    private const int SwShow = 5;
+    private const int SwMinimize = 6;
+    private const int SwShowMinNoActive = 7;
+    private const int SwShowNa = 8;
+    private const int SwRestore = 9;
 
     [StructLayout(LayoutKind.Sequential)]
     private readonly struct Rect
@@ -252,7 +283,7 @@ public partial class WindowManagerService : IWindowManagerService
                         Y = rect.Top,
                         Width = rect.Width,
                         Height = rect.Height,
-                        State = Models.WindowState.Normal // TODO: Detect actual state
+                        State = GetWindowState(hWnd)
                     });
                 }
             }
@@ -379,7 +410,7 @@ public partial class WindowManagerService : IWindowManagerService
                 Width = rect.Width,
                 Height = rect.Height,
                 MonitorIndex = GetMonitorIndex(hwnd),
-                State = Models.WindowState.Normal // TODO: Detect actual state
+                State = GetWindowState(hwnd)
             };
         }
         catch
@@ -415,7 +446,63 @@ public partial class WindowManagerService : IWindowManagerService
         return length > 0 ? new string(title, 0, length) : string.Empty;
     }
 
+    private static Models.WindowState GetWindowState(IntPtr hWnd)
+    {
+        if (IsIconic(hWnd))
+            return Models.WindowState.Minimized;
+        if (IsZoomed(hWnd))
+            return Models.WindowState.Maximized;
+        return Models.WindowState.Normal;
+    }
+
     public IntPtr GetForegroundWindow() => GetForegroundWindowNative();
+
+    public bool MaximizeWindow(IntPtr hwnd)
+    {
+        if (hwnd == IntPtr.Zero)
+        {
+            _logger.LogWarning("Cannot maximize window: invalid handle");
+            return false;
+        }
+
+        bool result = ShowWindowNative(hwnd, SwMaximize);
+        if (result)
+        {
+            _logger.LogInformation("Maximized window {Handle}", hwnd);
+        }
+        return result;
+    }
+
+    public bool MinimizeWindow(IntPtr hwnd)
+    {
+        if (hwnd == IntPtr.Zero)
+        {
+            _logger.LogWarning("Cannot minimize window: invalid handle");
+            return false;
+        }
+
+        bool result = ShowWindowNative(hwnd, SwMinimize);
+        if (result)
+        {
+            _logger.LogInformation("Minimized window {Handle}", hwnd);
+        }
+        return result;
+    }
+
+    public bool CloseWindow(IntPtr hwnd)
+    {
+        if (hwnd == IntPtr.Zero)
+        {
+            _logger.LogWarning("Cannot close window: invalid handle");
+            return false;
+        }
+
+        // Send WM_CLOSE message to allow graceful shutdown
+        const int WmClose = 0x0010;
+        _ = SendMessage(hwnd, WmClose, IntPtr.Zero, IntPtr.Zero);
+        _logger.LogInformation("Sent close message to window {Handle}", hwnd);
+        return true;
+    }
 
     public bool SnapWindowToZone(SnapZone zone, int monitorIndex = 0)
     {

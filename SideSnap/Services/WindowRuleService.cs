@@ -216,18 +216,18 @@ public partial class WindowRuleService : IWindowRuleService
                     break;
 
                 case RuleAction.Maximize:
-                    // TODO: Implement maximize via Win32 API
-                    _logger.LogDebug("Maximize action not yet implemented");
+                    _windowManager.MaximizeWindow(hwnd);
+                    _logger.LogInformation("Maximized window for rule '{Name}'", rule.Name);
                     break;
 
                 case RuleAction.Minimize:
-                    // TODO: Implement minimize via Win32 API
-                    _logger.LogDebug("Minimize action not yet implemented");
+                    _windowManager.MinimizeWindow(hwnd);
+                    _logger.LogInformation("Minimized window for rule '{Name}'", rule.Name);
                     break;
 
                 case RuleAction.Close:
-                    // TODO: Implement close via Win32 API
-                    _logger.LogDebug("Close action not yet implemented");
+                    _windowManager.CloseWindow(hwnd);
+                    _logger.LogInformation("Closed window for rule '{Name}'", rule.Name);
                     break;
             }
         }

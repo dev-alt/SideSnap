@@ -1,0 +1,81 @@
+<Window x:Class="SideSnap.Views.EditLayoutDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Edit Layout"
+        Height="400"
+        Width="500"
+        WindowStartupLocation="CenterOwner"
+        Background="#ECF0F1">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0"
+                   Text="Edit Window Layout"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Foreground="#2C3E50"
+                   Margin="0,0,0,20"/>
+
+        <!-- Name -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+            <TextBlock Text="Layout Name" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <TextBox x:Name="LayoutNameTextBox"
+                     Padding="8"
+                     FontSize="14"/>
+        </StackPanel>
+
+        <!-- Icon -->
+        <StackPanel Grid.Row="2" Margin="0,0,0,10">
+            <TextBlock Text="Icon (emoji)" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <TextBox x:Name="IconTextBox"
+                     Padding="8"
+                     FontSize="14"
+                     MaxLength="2"/>
+        </StackPanel>
+
+        <!-- Launch Behavior -->
+        <StackPanel Grid.Row="3" Margin="0,0,0,10">
+            <TextBlock Text="Launch Behavior" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <ComboBox x:Name="LaunchBehaviorComboBox"
+                      Padding="8"
+                      FontSize="14">
+                <ComboBoxItem Content="Only position windows" IsSelected="True"/>
+                <ComboBoxItem Content="Launch apps and position"/>
+                <ComboBoxItem Content="Close existing and launch new"/>
+            </ComboBox>
+        </StackPanel>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="4"
+                   Orientation="Horizontal"
+                   HorizontalAlignment="Right"
+                   Margin="0,20,0,0">
+            <Button Content="Save"
+                   Click="SaveButton_Click"
+                   Width="80"
+                   Height="35"
+                   Margin="0,0,10,0"
+                   Background="#27AE60"
+                   Foreground="White"
+                   BorderThickness="0"
+                   FontWeight="Bold"
+                   Cursor="Hand"/>
+            <Button Content="Cancel"
+                   Click="CancelButton_Click"
+                   Width="80"
+                   Height="35"
+                   Background="#95A5A6"
+                   Foreground="White"
+                   BorderThickness="0"
+                   Cursor="Hand"/>
+        </StackPanel>
+    </Grid>
+</Window>

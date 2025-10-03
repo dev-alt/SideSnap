@@ -94,6 +94,7 @@ public partial class App
         services.AddTransient<AddProjectDialog>();
         services.AddTransient<QuickNotesWindow>();
         services.AddTransient<ClipboardHistoryWindow>();
+        services.AddTransient<EditLayoutDialog>();
     }
 
     private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)

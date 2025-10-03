@@ -740,10 +740,17 @@ public partial class MainViewModel : ViewModelBase
 
         try
         {
-            var dialog = _serviceProvider.GetRequiredService<AddProjectDialog>();
-            dialog.Title = "Edit Layout";
-            // TODO: Create dedicated layout editor dialog
-            _logger.LogInformation("Edit layout: {Name}", layout.Name);
+            var dialog = new EditLayoutDialog(layout);
+            dialog.Owner = System.Windows.Application.Current.MainWindow;
+
+            if (dialog.ShowDialog() == true)
+            {
+                layout.Name = dialog.LayoutName;
+                layout.IconPath = dialog.IconPath;
+                layout.LaunchBehavior = dialog.LaunchBehavior;
+                _layoutService.SaveLayouts(Layouts);
+                _logger.LogInformation("Updated layout: {Name}", layout.Name);
+            }
         }
         catch (Exception ex)
         {

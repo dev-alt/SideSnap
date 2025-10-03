@@ -48,6 +48,21 @@ public interface IWindowManagerService
     /// Gets the foreground window handle
     /// </summary>
     IntPtr GetForegroundWindow();
+
+    /// <summary>
+    /// Maximizes a window
+    /// </summary>
+    bool MaximizeWindow(IntPtr hwnd);
+
+    /// <summary>
+    /// Minimizes a window
+    /// </summary>
+    bool MinimizeWindow(IntPtr hwnd);
+
+    /// <summary>
+    /// Closes a window
+    /// </summary>
+    bool CloseWindow(IntPtr hwnd);
 }
 
 /// <summary>
