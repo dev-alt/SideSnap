@@ -43,46 +43,90 @@
                 <RowDefinition Height="48"/>
             </Grid.RowDefinitions>
 
-            <!-- Header with Exit Button -->
+            <!-- Header with Lock/Unlock and Exit Button -->
             <Border x:Name="HeaderBorder" Grid.Row="0" Background="#2C3E50" Height="32">
-                <Button Content="✕"
-                       Click="ExitButton_Click"
-                       Foreground="White"
-                       Background="#E74C3C"
-                       BorderThickness="0"
-                       FontSize="16"
-                       FontWeight="Bold"
-                       Width="32"
-                       Height="32"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Top"
-                       Cursor="Hand"
-                       Padding="0">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Background" Value="#E74C3C"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}"
-                                               CornerRadius="0,8,0,0">
-                                            <ContentPresenter HorizontalAlignment="Center"
-                                                            VerticalAlignment="Center"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#C0392B"/>
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter Property="Background" Value="#A93226"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <Grid>
+                    <!-- Lock/Unlock Button -->
+                    <Button Content="{Binding IsLocked, Converter={StaticResource LockIcon}}"
+                           Command="{Binding ToggleLockCommand}"
+                           Foreground="White"
+                           Background="#3498DB"
+                           BorderThickness="0"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Width="32"
+                           Height="32"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top"
+                           Cursor="Hand"
+                           Padding="0"
+                           ToolTip="Lock/Unlock sidebar for rearranging">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#3498DB"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                   CornerRadius="8,0,0,0">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#2980B9"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter Property="Background" Value="#21618C"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <!-- Exit Button -->
+                    <Button Content="✕"
+                           Click="ExitButton_Click"
+                           Foreground="White"
+                           Background="#E74C3C"
+                           BorderThickness="0"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           Width="32"
+                           Height="32"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Top"
+                           Cursor="Hand"
+                           Padding="0">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#E74C3C"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                   CornerRadius="0,8,0,0">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#C0392B"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter Property="Background" Value="#A93226"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
             </Border>
 
             <!-- Content Area -->
@@ -138,9 +182,9 @@
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <Image Width="24"
-                                              Height="24"
-                                              Margin="0,0,0,3"
+                                        <Image Width="18"
+                                              Height="18"
+                                              Margin="0,0,0,2"
                                               RenderOptions.BitmapScalingMode="HighQuality">
                                             <Image.Source>
                                                 <MultiBinding Converter="{StaticResource CustomIconConverter}">
@@ -153,8 +197,8 @@
                                                   Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
                                                   TextWrapping="Wrap"
                                                   TextAlignment="Center"
-                                                  FontSize="8"
-                                                  MaxWidth="85"/>
+                                                  FontSize="7"
+                                                  MaxWidth="70"/>
                                     </StackPanel>
                                 </Button>
                             </DataTemplate>

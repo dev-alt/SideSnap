@@ -12,6 +12,7 @@
             <utils:BoolToColorConverter x:Key="BoolToColor"/>
             <utils:RgbToColorConverter x:Key="RgbToColor"/>
             <utils:FolderPreviewConverter x:Key="FolderPreview"/>
+            <utils:LockIconConverter x:Key="LockIcon"/>
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles.xaml"/>

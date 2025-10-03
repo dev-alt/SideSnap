@@ -26,6 +26,9 @@ public partial class MainViewModel : ViewModelBase
     private bool _isExpanded;
 
     [ObservableProperty]
+    private bool _isLocked = true;
+
+    [ObservableProperty]
     private double _sidebarWidth = 250;
 
     [ObservableProperty]
@@ -365,6 +368,7 @@ public partial class MainViewModel : ViewModelBase
     {
         var settings = _settingsService.LoadSettings();
         SidebarWidth = settings.SidebarWidth;
+        IsLocked = settings.IsLocked;
     }
 
     private void LoadShortcuts()
@@ -834,5 +838,13 @@ public partial class MainViewModel : ViewModelBase
         {
             _logger.LogError(ex, "Failed to open Clipboard History");
         }
+    }
+
+    [RelayCommand]
+    private void ToggleLock()
+    {
+        IsLocked = !IsLocked;
+        _settingsService.UpdateLockState(IsLocked);
+        _logger.LogInformation("Sidebar lock state: {State}", IsLocked ? "Locked" : "Unlocked");
     }
 }

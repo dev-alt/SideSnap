@@ -44,4 +44,11 @@ public class SettingsService : ISettingsService
         });
         File.WriteAllText(_settingsPath, json);
     }
+
+    public void UpdateLockState(bool isLocked)
+    {
+        var settings = LoadSettings();
+        settings.IsLocked = isLocked;
+        SaveSettings(settings);
+    }
 }

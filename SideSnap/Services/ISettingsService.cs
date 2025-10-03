@@ -6,4 +6,5 @@ public interface ISettingsService
 {
     AppSettings LoadSettings();
     void SaveSettings(AppSettings settings);
+    void UpdateLockState(bool isLocked);
 }
