@@ -225,7 +225,7 @@
                                            HorizontalAlignment="Stretch"
                                            Focusable="True"
                                            Style="{StaticResource SidebarButton}"
-                                           MouseEnter="ProjectButton_MouseEnter"
+                                           Click="ProjectButton_Click"
                                            MouseLeave="ProjectButton_MouseLeave"
                                            IsHitTestVisible="True">
                                         <Button.ContextMenu>
