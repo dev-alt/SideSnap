@@ -78,6 +78,7 @@ public partial class App
         services.AddSingleton<IWindowRuleService, WindowRuleService>();
         services.AddSingleton<IQuickNotesService, QuickNotesService>();
         services.AddSingleton<IClipboardService, ClipboardService>();
+        services.AddSingleton<IStartupService, StartupService>();
 
         // ViewModels
         services.AddSingleton<MainViewModel>();

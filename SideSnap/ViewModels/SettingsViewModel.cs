@@ -8,6 +8,7 @@ namespace SideSnap.ViewModels;
 public partial class SettingsViewModel : ViewModelBase
 {
     private readonly ISettingsService _settingsService;
+    private readonly IStartupService _startupService;
     private readonly ILogger<SettingsViewModel> _logger;
 
     [ObservableProperty]
@@ -15,6 +16,18 @@ public partial class SettingsViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _startWithWindows;
+
+    partial void OnStartWithWindowsChanged(bool value)
+    {
+        if (value)
+        {
+            _startupService.EnableStartup();
+        }
+        else
+        {
+            _startupService.DisableStartup();
+        }
+    }
 
     [ObservableProperty]
     private bool _darkMode;
@@ -43,9 +56,13 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private int _iconPackIndex;
 
-    public SettingsViewModel(ISettingsService settingsService, ILogger<SettingsViewModel> logger)
+    public SettingsViewModel(
+        ISettingsService settingsService,
+        IStartupService startupService,
+        ILogger<SettingsViewModel> logger)
     {
         _settingsService = settingsService;
+        _startupService = startupService;
         _logger = logger;
 
         LoadSettings();

@@ -18,7 +18,8 @@
       "Bash(dotnet build:*)",
       "Read(//mnt/c/Users/andre/Desktop/Projects/SideSnap/**)",
       "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -File build.ps1)",
-      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -Command \"dotnet build SideSnap/SideSnap.csproj\")"
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -Command \"dotnet build SideSnap/SideSnap.csproj\")",
+      "Bash(/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -Command \"dotnet build SideSnap/SideSnap.csproj 2>&1 | Select-Object -Last 20\")"
     ],
     "deny": [],
     "ask": []
