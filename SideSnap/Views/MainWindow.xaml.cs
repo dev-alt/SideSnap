@@ -492,18 +492,18 @@ public partial class MainWindow
 
     private void ProjectButton_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        // Cancel any pending close
+        // Cancel any pending close timer
         _popupCloseTimer?.Stop();
 
         if (sender is System.Windows.Controls.Button button && button.DataContext is Models.Project project)
         {
-            // Close any currently open popup first (like a menu system)
+            // Close previous popup immediately (menu-style behavior)
             if (_currentOpenPopup != null && _currentOpenPopup.IsOpen)
             {
                 _currentOpenPopup.IsOpen = false;
             }
 
-            // Find the popup in the visual tree
+            // Open this popup
             var grid = button.Parent as System.Windows.Controls.Grid;
             if (grid != null)
             {
@@ -519,39 +519,40 @@ public partial class MainWindow
 
     private void ProjectButton_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        // Only close if mouse is moving right (out of sidebar), not down within sidebar
-        var mousePosition = System.Windows.Input.Mouse.GetPosition(this);
-        var sidebarWidth = Width;
-
-        // If mouse is still within sidebar width, don't close
-        if (mousePosition.X <= sidebarWidth)
-        {
-            return;
-        }
-
-        // Start a timer to close the popup if mouse doesn't enter it
-        _popupCloseTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
-        _popupCloseTimer.Tick += (s, args) =>
-        {
-            _popupCloseTimer?.Stop();
-            if (_currentOpenPopup != null && !_currentOpenPopup.IsMouseOver)
-            {
-                _currentOpenPopup.IsOpen = false;
-                _currentOpenPopup = null;
-            }
-        };
-        _popupCloseTimer.Start();
+        // Start delayed close (gives time to move mouse to popup)
+        StartPopupCloseTimer();
     }
 
     private void ProjectPopup_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        // Cancel the close timer when mouse enters popup
+        // Mouse entered popup, cancel close
         _popupCloseTimer?.Stop();
     }
 
     private void ProjectPopup_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        // Close the popup when mouse leaves it
+        // Mouse left popup, close immediately
+        CloseCurrentPopup();
+    }
+
+    private void StartPopupCloseTimer()
+    {
+        _popupCloseTimer?.Stop();
+        _popupCloseTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+        _popupCloseTimer.Tick += (s, args) =>
+        {
+            _popupCloseTimer?.Stop();
+            // Only close if mouse isn't over the popup
+            if (_currentOpenPopup != null && !_currentOpenPopup.IsMouseOver)
+            {
+                CloseCurrentPopup();
+            }
+        };
+        _popupCloseTimer.Start();
+    }
+
+    private void CloseCurrentPopup()
+    {
         if (_currentOpenPopup != null)
         {
             _currentOpenPopup.IsOpen = false;

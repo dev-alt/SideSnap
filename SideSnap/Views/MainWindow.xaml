@@ -240,9 +240,9 @@
                                             </ContextMenu>
                                         </Button.ContextMenu>
                                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                            <Image Width="24"
-                                                  Height="24"
-                                                  Margin="0,0,0,3"
+                                            <Image Width="18"
+                                                  Height="18"
+                                                  Margin="0,0,0,2"
                                                   RenderOptions.BitmapScalingMode="HighQuality">
                                                 <Image.Source>
                                                     <MultiBinding Converter="{StaticResource CustomIconConverter}">
@@ -255,8 +255,8 @@
                                                       Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
                                                       TextWrapping="Wrap"
                                                       TextAlignment="Center"
-                                                      FontSize="8"
-                                                      MaxWidth="85"/>
+                                                      FontSize="7"
+                                                      MaxWidth="70"/>
                                         </StackPanel>
                                     </Button>
 
@@ -386,9 +386,9 @@
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                        <TextBlock FontSize="20"
+                                        <TextBlock FontSize="16"
                                                   TextAlignment="Center"
-                                                  Margin="0,0,0,3">
+                                                  Margin="0,0,0,2">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource CommandIconConverter}">
                                                     <Binding Path="CustomIconPath"/>
@@ -400,8 +400,8 @@
                                                   Visibility="{Binding ShowLabel, Converter={StaticResource BoolToVis}}"
                                                   TextWrapping="Wrap"
                                                   TextAlignment="Center"
-                                                  FontSize="8"
-                                                  MaxWidth="85"/>
+                                                  FontSize="7"
+                                                  MaxWidth="70"/>
                                     </StackPanel>
                                 </Button>
                             </DataTemplate>
