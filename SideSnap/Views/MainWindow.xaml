@@ -370,13 +370,21 @@
                            Style="{StaticResource AddButton}"/>
 
                     <!-- Window Layouts Section -->
-                    <TextBlock Text="Window Layouts"
-                              FontWeight="Bold"
-                              FontSize="10"
-                              Foreground="#7F8C8D"
-                              Margin="5,10,5,5"/>
-
-                    <ItemsControl ItemsSource="{Binding Layouts}">
+                    <Expander Header="Window Layouts"
+                             IsExpanded="False"
+                             Margin="5,10,5,5"
+                             Background="Transparent"
+                             Foreground="#7F8C8D">
+                        <Expander.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"
+                                          FontWeight="Bold"
+                                          FontSize="10"
+                                          Foreground="#7F8C8D"/>
+                            </DataTemplate>
+                        </Expander.HeaderTemplate>
+                        <StackPanel>
+                    <ItemsControl ItemsSource="{Binding Layouts}" Margin="0,5,0,0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button Command="{Binding DataContext.ApplyLayoutCommand, Source={x:Reference RootWindow}}"
@@ -424,17 +432,27 @@
 
                     <Button Content="📸 Capture"
                            Command="{Binding CaptureLayoutCommand}"
-                           Margin="5,5,5,10"
+                           Margin="5,5,5,5"
                            Style="{StaticResource AddButton}"/>
+                        </StackPanel>
+                    </Expander>
 
                     <!-- Window Rules Section -->
-                    <TextBlock Text="Window Rules"
-                              FontWeight="Bold"
-                              FontSize="10"
-                              Foreground="#7F8C8D"
-                              Margin="5,10,5,5"/>
-
-                    <ItemsControl ItemsSource="{Binding WindowRules}">
+                    <Expander Header="Window Rules"
+                             IsExpanded="False"
+                             Margin="5,10,5,5"
+                             Background="Transparent"
+                             Foreground="#7F8C8D">
+                        <Expander.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"
+                                          FontWeight="Bold"
+                                          FontSize="10"
+                                          Foreground="#7F8C8D"/>
+                            </DataTemplate>
+                        </Expander.HeaderTemplate>
+                        <StackPanel>
+                    <ItemsControl ItemsSource="{Binding WindowRules}" Margin="0,5,0,0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button Command="{Binding DataContext.ToggleWindowRuleCommand, Source={x:Reference RootWindow}}"
@@ -482,39 +500,49 @@
 
                     <Button Content="➕ Add Rule"
                            Command="{Binding AddWindowRuleCommand}"
-                           Margin="5,5,5,10"
+                           Margin="5,5,5,5"
                            Style="{StaticResource AddButton}"/>
+                        </StackPanel>
+                    </Expander>
 
                     <!-- Snap Zones Section -->
-                    <TextBlock Text="Window Snap"
-                              FontWeight="Bold"
-                              FontSize="10"
-                              Foreground="#7F8C8D"
-                              Margin="5,10,5,5"/>
-
-                    <ItemsControl ItemsSource="{Binding SnapZones}">
-                        <ItemsControl.ItemTemplate>
+                    <Expander Header="Window Snap"
+                             IsExpanded="False"
+                             Margin="5,10,5,5"
+                             Background="Transparent"
+                             Foreground="#7F8C8D">
+                        <Expander.HeaderTemplate>
                             <DataTemplate>
-                                <Button Command="{Binding DataContext.SnapToZoneCommand, Source={x:Reference RootWindow}}"
-                                       CommandParameter="{Binding}"
-                                       Margin="5,2"
-                                       Style="{StaticResource SidebarButton}">
-                                    <Button.ToolTip>
-                                        <ToolTip Content="{Binding Name}"/>
-                                    </Button.ToolTip>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                        <TextBlock Text="{Binding Icon}"
-                                                  FontSize="16"
-                                                  Margin="0,0,8,0"
-                                                  VerticalAlignment="Center"/>
-                                        <TextBlock Text="{Binding Name}"
-                                                  FontSize="10"
-                                                  VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
+                                <TextBlock Text="{Binding}"
+                                          FontWeight="Bold"
+                                          FontSize="10"
+                                          Foreground="#7F8C8D"/>
                             </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                        </Expander.HeaderTemplate>
+                        <ItemsControl ItemsSource="{Binding SnapZones}" Margin="0,5,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding DataContext.SnapToZoneCommand, Source={x:Reference RootWindow}}"
+                                           CommandParameter="{Binding}"
+                                           Margin="5,2"
+                                           Style="{StaticResource SidebarButton}">
+                                        <Button.ToolTip>
+                                            <ToolTip Content="{Binding Name}"/>
+                                        </Button.ToolTip>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                            <TextBlock Text="{Binding Icon}"
+                                                      FontSize="16"
+                                                      Margin="0,0,8,0"
+                                                      VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Name}"
+                                                      FontSize="10"
+                                                      VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Expander>
 
                 </StackPanel>
             </ScrollViewer>
