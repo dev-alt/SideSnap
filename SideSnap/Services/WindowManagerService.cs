@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using SideSnap.Models;
 
 namespace SideSnap.Services;
@@ -9,6 +10,7 @@ namespace SideSnap.Services;
 public partial class WindowManagerService : IWindowManagerService
 {
     private readonly string _positionsPath;
+    private readonly ILogger<WindowManagerService> _logger;
 
     // Win32 API imports
     [LibraryImport("user32.dll")]
@@ -88,8 +90,9 @@ public partial class WindowManagerService : IWindowManagerService
         public int Height => Bottom - Top;
     }
 
-    public WindowManagerService()
+    public WindowManagerService(ILogger<WindowManagerService> logger)
     {
+        _logger = logger;
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var appFolder = Path.Combine(appDataPath, "SideSnap");
         Directory.CreateDirectory(appFolder);

@@ -48,8 +48,8 @@
                       Padding="8"
                       FontSize="14">
                 <ComboBoxItem Content="Only position windows" IsSelected="True"/>
-                <ComboBoxItem Content="Launch apps and position"/>
-                <ComboBoxItem Content="Close existing and launch new"/>
+                <ComboBoxItem Content="Launch if not running"/>
+                <ComboBoxItem Content="Always launch"/>
             </ComboBox>
         </StackPanel>
 

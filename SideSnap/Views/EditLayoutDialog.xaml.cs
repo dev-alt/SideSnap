@@ -28,15 +28,15 @@ public partial class EditLayoutDialog : Window
 
         if (string.IsNullOrWhiteSpace(LayoutName))
         {
-            MessageBox.Show("Please enter a layout name", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+            System.Windows.MessageBox.Show("Please enter a layout name", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
         LaunchBehavior = LaunchBehaviorComboBox.SelectedIndex switch
         {
             0 => LaunchBehavior.OnlyPosition,
-            1 => LaunchBehavior.LaunchAndPosition,
-            2 => LaunchBehavior.CloseAndLaunch,
+            1 => LaunchBehavior.LaunchIfNotRunning,
+            2 => LaunchBehavior.AlwaysLaunch,
             _ => LaunchBehavior.OnlyPosition
         };
 
