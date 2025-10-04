@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SideSnap - Smart sidebar for quick access and window management on Windows">
+    <meta name="keywords" content="sidebar, productivity, window manager, Windows, launcher, snap zones">
+    <title>SideSnap - Smart Sidebar & Window Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            background: white;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .feature h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .feature p {
+            color: #555;
+        }
+
+        section {
+            margin-bottom: 60px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .key-features {
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+
+        .key-features ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .key-features li {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .key-features li::before {
+            content: '✓';
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .links {
+            margin-top: 20px;
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .hero p {
+                font-size: 1.1em;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .key-features ul {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>🪟 SideSnap</h1>
+        <p>Smart Sidebar & Window Manager for Windows</p>
+        <p>Boost your productivity with quick access and powerful window management</p>
+
+        <div class="cta-buttons">
+            <a href="https://github.com/dev-alt/SideSnap/releases" class="btn btn-primary">Download Now</a>
+            <a href="https://github.com/dev-alt/SideSnap" class="btn btn-secondary">View on GitHub</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <section>
+            <h2>Features</h2>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">📁</div>
+                    <h3>Quick Access</h3>
+                    <p>Launch folders, files, and PowerShell commands instantly from a sleek sidebar. Organize with custom icons and project groups.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🪟</div>
+                    <h3>Window Management</h3>
+                    <p>10 snap zones for precise window positioning. Save and restore multi-monitor layouts. Auto-positioning rules for your apps.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Beautiful & Customizable</h3>
+                    <p>5 visual styles including Glass, Acrylic, and Neumorphism. Dark/Light mode. Custom colors and transparency.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📝</div>
+                    <h3>Productivity Tools</h3>
+                    <p>Quick notes scratchpad, clipboard history, todo lists, and folder preview on hover.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Smart Auto-Hide</h3>
+                    <p>Sidebar hides when not needed, appears on hover. Reserve screen space or overlay windows.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Privacy First</h3>
+                    <p>100% local storage. No data collection, no telemetry, no internet required. Your data stays on your device.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>What You Can Do</h2>
+            <div class="key-features">
+                <ul>
+                    <li>Pin your favorite folders for one-click access</li>
+                    <li>Create custom PowerShell commands and scripts</li>
+                    <li>Snap windows to 10 predefined zones</li>
+                    <li>Save window layouts for different workflows</li>
+                    <li>Auto-position apps with window rules</li>
+                    <li>Access recent clipboard history</li>
+                    <li>Write quick notes without opening apps</li>
+                    <li>Preview folder contents on hover</li>
+                    <li>Organize projects with dropdown groups</li>
+                    <li>Customize appearance with themes and colors</li>
+                    <li>Start automatically with Windows</li>
+                    <li>Control from system tray</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>System Requirements</h2>
+            <div style="text-align: center; padding: 20px;">
+                <p><strong>OS:</strong> Windows 10 (Build 17763) or Windows 11</p>
+                <p><strong>Runtime:</strong> .NET 8 Desktop Runtime</p>
+                <p><strong>Architecture:</strong> x64</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Open Source</h2>
+            <div style="text-align: center; padding: 20px;">
+                <p>SideSnap is free and open source software built with WPF and C#.</p>
+                <p>Licensed under MIT License. Contributions welcome!</p>
+                <div class="cta-buttons">
+                    <a href="https://github.com/dev-alt/SideSnap" class="btn btn-primary">Contribute on GitHub</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p><strong>SideSnap</strong> - Smart Sidebar & Window Manager</p>
+        <div class="links">
+            <a href="privacy-policy.html">Privacy Policy</a>
+            <a href="https://github.com/dev-alt/SideSnap">GitHub Repository</a>
+            <a href="https://github.com/dev-alt/SideSnap/releases">Download</a>
+            <a href="https://github.com/dev-alt/SideSnap/issues">Report Issues</a>
+        </div>
+        <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
+            &copy; 2025 SideSnap. Open Source Project. MIT License.
+        </p>
+    </footer>
+</body>
+</html>

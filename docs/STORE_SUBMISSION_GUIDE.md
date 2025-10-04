@@ -221,23 +221,17 @@ msbuild SideSnap.Package/SideSnap.Package.wapproj /p:Configuration=Release /p:Pl
 
 5. **Privacy Policy**:
    - **Required**: Must provide URL
-   - **Options**:
-     - Host on GitHub Pages: `https://[username].github.io/SideSnap/PRIVACY_POLICY.html`
-     - Convert PRIVACY_POLICY.md to HTML and host
-     - Use GitHub raw URL (not recommended for production)
+   - **Privacy Policy URL**: `https://dev-alt.github.io/SideSnap/privacy-policy.html`
 
-   **Quick Setup** (GitHub Pages):
-   ```bash
-   # In your repository
-   git checkout -b gh-pages
-   cp PRIVACY_POLICY.md index.md
-   # Or create index.html from PRIVACY_POLICY.md
-   git add index.md
-   git commit -m "Add privacy policy page"
-   git push origin gh-pages
-   # Enable GitHub Pages in repo settings
-   # URL will be: https://[username].github.io/SideSnap/
-   ```
+   **Setup Instructions**:
+   - HTML files are already created in `docs/` folder
+   - Enable GitHub Pages in repository settings:
+     1. Go to: `https://github.com/dev-alt/SideSnap/settings/pages`
+     2. Source: Deploy from a branch
+     3. Branch: `master`, Folder: `/docs`
+     4. Click Save
+   - Site will be live at: `https://dev-alt.github.io/SideSnap/`
+   - See `docs/GITHUB_PAGES_SETUP.md` for detailed instructions
 
 ### Step 5: Pricing and Availability
 
