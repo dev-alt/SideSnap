@@ -7,13 +7,13 @@
   IgnorableNamespaces="uap rescap desktop">
 
   <Identity
-    Name="SideSnap"
-    Publisher="CN=YourPublisherName"
+    Name="Dev-Alt.SideSnap"
+    Publisher="CN=72D846BF-7EF4-4A7E-AB29-7DDF7B1E4916"
     Version="1.0.0.0" />
 
   <Properties>
     <DisplayName>SideSnap - Smart Sidebar &amp; Window Manager</DisplayName>
-    <PublisherDisplayName>Your Publisher Name</PublisherDisplayName>
+    <PublisherDisplayName>Dev-Alt</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 

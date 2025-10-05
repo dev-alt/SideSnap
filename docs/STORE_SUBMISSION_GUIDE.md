@@ -39,6 +39,16 @@ SideLaunch/
 
 ## Step-by-Step Submission Process
 
+### Identifiers (for SideSnap)
+
+- Package/Identity/Name: `Dev-Alt.SideSnap`
+- Package/Identity/Publisher: `CN=72D846BF-7EF4-4A7E-AB29-7DDF7B1E4916`
+- Package/Properties/PublisherDisplayName: `Dev-Alt`
+- Package Family Name (PFN): `Dev-Alt.SideSnap_n5bevhycpgrya`
+- Package SID: `S-1-15-2-2479084337-1392210777-1530537585-3357496515-3183028803-3683225135-2979958439`
+- Store ID: `9NH1LJHQS8GS`
+- Web Store URL: Available after the product is live
+
 ### Step 1: Configure Publisher Identity
 
 1. **Get your Publisher ID** from Partner Center:
